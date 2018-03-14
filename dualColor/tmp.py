@@ -12,11 +12,14 @@ import isxrgb
 
 def main():
 
-    run_signal_split()
-    # run_test_data()
+    isx.initialize()
+
+    # run_signal_split()
+    run_test_data()
     # run_exp_data()
     # spatial_bandpass_movie()
 
+    isx.shutdown()
 
 def run_signal_split():
     root_dir = '/Volumes/data2/Alice/NV3_DualColor/D_Lab/' \
@@ -50,22 +53,23 @@ def run_signal_split():
     exp = isxrgb.get_exp_label(rgb_files_root)
 
     # write the xyz into a movie
-    input_mov = isx.Movie(rgb_files_with_path[0])
-    assert input_mov.data_type == np.uint16
 
-    output_filename = 'xyz'
+    output_filename = 'xyz.isxd'
     save_filename_with_path = '{}/result/isxd/{}'.format(os.getcwd(), output_filename)
-    output_mov = isx.Movie(save_filename_with_path,
-                           frame_rate=input_mov.frame_rate,
-                           shape=shape[1:3],
-                           num_frames=len(select_frames),
-                           data_type=input_mov.data_type)
+    if os.path.exists(save_filename_with_path):
+        os.remove(save_filename_with_path)
+    frame_period = 50000
+
+    isx.initialize()
+    output_mov = isx.Movie(save_filename_with_path, frame_period=frame_period, shape=shape[1:3],
+                           num_frames=len(select_frames), data_type=np.uint16)
 
     for i, frame_idx in enumerate(select_frames):
         rgb_s, xyz = isxrgb.rgb_signal_split(stack[:, :, :, i], exp)
-        output_mov.write_frame(xyz, i)
+        xyz[xyz<0] = 0
+        gcamp = xyz[0, :, :]
+        output_mov.write_frame(gcamp, i)
 
-    input_mov.close()
     output_mov.close()
 
     isx.shutdown()
@@ -90,8 +94,9 @@ def run_signal_split():
 
 
 def run_test_data():
-    root_dir = '/Volumes/data2/Sabrina/NV3_01_greenpixel_bitsdrop/'
-    filename = 'v3-01_gr_0ff.isxd' #'v3-01_gb_0ff.isxd' #'v3-01_blue_0ff.isxd' #'v3-01_red_0ff.isxd' #'Movie_2018-01-30-12-53-38_red_only.isxd'  #'Movie_2018-01-30-12-56-08_blue_only.isxd'  #'img_2018-03-08-15-41-21 A80043050047 colorbars.tif' #'img_2018-03-08-15-43-46 A80043050039 colorbars.tif'
+    root_dir = '/Users/Sabrina/git/myWork/dualColor/result/isxd'    #xyz.isxd'
+    #'/Volumes/data2/Sabrina/NV3_01_greenpixel_bitsdrop/'
+    filename = 'xyz.isxd'   #'v3-01_gr_0ff.isxd' #'v3-01_gb_0ff.isxd' #'v3-01_blue_0ff.isxd' #'v3-01_red_0ff.isxd' #'Movie_2018-01-30-12-53-38_red_only.isxd'  #'Movie_2018-01-30-12-56-08_blue_only.isxd'  #'img_2018-03-08-15-41-21 A80043050047 colorbars.tif' #'img_2018-03-08-15-43-46 A80043050039 colorbars.tif'
     # #'A80043050039.tif' #'Movie_2018-01-30-12-55-17_greenr_raw.isxd' #'Movie_2018-01-30-12-56-52_greenb_raw.isxd' #'both_green_fff_2016-02-11-14-15-10_raw.isxd' #
     select_frames = [0]
     microscope_name = 'NV3-1' #'JH_cropEdge'
@@ -148,7 +153,7 @@ def run_test_data():
 
     plt.suptitle('{} \n{}'.format(microscope_name, filename))
     plt.sca(hax[0])
-    im = plt.imshow(stack[:20, :30, 0], cmap='jet', aspect='equal')  #0:20, 0:30
+    im = plt.imshow(stack[:, :, 0], cmap='jet', aspect='equal')  #0:20, 0:30
     # hax[0].xaxis.set_ticks(range(0, 30, 5))
     # hax[0].yaxis.set_ticks(range(0, 20, 5))
 
@@ -177,9 +182,8 @@ def run_test_data():
 
 
 def run_exp_data():
-    root_dir = '/Volumes/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/' \
-                'V3_71/20171127/led1'
-    select_frames = [10]
+    root_dir = '/Volumes/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3_71/20171127/led1'
+    select_frames = [0]
 
     fn = [f for f in listdir(root_dir) if isfile(join(root_dir, f))]
     print('{} files have been found, they are \n {}'.format(len(fn), fn))

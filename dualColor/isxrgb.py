@@ -2,13 +2,12 @@
 # isxrgb.py
 import isx
 
-isx.initialize()
-
-
 def get_rgb_frame(rgb_files, frame_idx, camera_bias=None, correct_stray_light=None, correct_bad_pixels=None):
     import os
     from PIL import Image
     import numpy as np
+
+    isx.initialize()
 
     # get movie info for each channel
     if camera_bias is None:
@@ -77,6 +76,8 @@ def get_rgb_frame(rgb_files, frame_idx, camera_bias=None, correct_stray_light=No
 
     if correct_bad_pixels:
         rgb_frame = discard_bad_pixels(rgb_frame)
+
+    isx.shutdown()
 
     return rgb_frame
 
@@ -343,6 +344,8 @@ def get_rgb_pixel_time(rgb_files_with_path, select_frame_idx=None, select_pixel_
     from PIL import Image
     import numpy as np
 
+    isx.initialize()
+
     # Get intensity for specific pixels at specific frames
     ext = os.path.splitext(rgb_files_with_path[0])[1]
     if ext == '.isxd':
@@ -379,6 +382,8 @@ def get_rgb_pixel_time(rgb_files_with_path, select_frame_idx=None, select_pixel_
                                        correct_bad_pixels=correct_bad_pixels)
         rgb_pixel_time[:, :, i] = this_rgb_frame.reshape([-1, n_pixels])[:, select_pixel_idx]
         print('frame {}'.format(frame_idx))
+
+    isx.shutdown()
 
     return rgb_pixel_time
 
