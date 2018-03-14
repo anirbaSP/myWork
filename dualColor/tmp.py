@@ -21,7 +21,7 @@ def main():
 def run_signal_split():
     root_dir = '/Volumes/data2/Alice/NV3_DualColor/D_Lab/' \
                'Masa/20170816/led12'    #NV3_color_sensor_12bit/V3_71/20171127/led1'
-    select_frames = [100]
+    select_frames = [0, 100]
 
     fn = [f for f in listdir(root_dir) if isfile(join(root_dir, f))]
     print('{} files have been found, they are \n {}'.format(len(fn), fn))
@@ -39,32 +39,52 @@ def run_signal_split():
             stack = np.empty([shape[0], shape[1], shape[2], len(select_frames)])
         stack[:, :, :, i] = this_frame
 
-    plt.figure()
-    plt.imshow(stack[1, :, :, 0])
+    # plt.figure()
+    # plt.imshow(stack[1, :, :, 0])
 
-    figure_name = 'x_all'
-    plt.savefig(figure_name)
+    # figure_name = 'x_all'
+    # plt.savefig(figure_name)
 
     rgb_files_root = isxrgb.find_rgb_channels(rgb_files)[1]
     rgb_files_root = os.path.split(rgb_files_root)[1]
     exp = isxrgb.get_exp_label(rgb_files_root)
-    rgb_s, xyz = isxrgb.rgb_signal_split(stack[:, :, :, 0], exp)
+
+    # write the xyz into a movie
+    input_mov = isx.Movie(rgb_files_with_path[0])
+    assert input_mov.data_type == np.uint16
+
+    output_filename = 'xyz'
+    save_filename_with_path = '{}/result/isxd/{}'.format(os.getcwd(), output_filename)
+    output_mov = isx.Movie(save_filename_with_path,
+                           frame_rate=input_mov.frame_rate,
+                           shape=shape[1:3],
+                           num_frames=len(select_frames),
+                           data_type=input_mov.data_type)
+
+    for i, frame_idx in enumerate(select_frames):
+        rgb_s, xyz = isxrgb.rgb_signal_split(stack[:, :, :, i], exp)
+        output_mov.write_frame(xyz, i)
+
+    input_mov.close()
+    output_mov.close()
+
+    isx.shutdown()
+
 
     # show the result
-    tissue = list(rgb_s.keys())
-    shape = rgb_s[tissue[0]].shape
-    n_ch = shape[0]
-    n_row = shape[1]
-    n_col = shape[2]
-    n_led = shape[3]
-    for i, this_tissue in enumerate(tissue):
-        for j in range(n_led):
-            isxrgb.show_rgb_frame(rgb_s[this_tissue][:, :, :, j], clim=[0, 5000])
-            plt.suptitle('{}, led{}'.format(this_tissue, j+1))
+    # tissue = list(rgb_s.keys())
+    # shape = rgb_s[tissue[0]].shape
+    # n_ch = shape[0]
+    # n_row = shape[1]
+    # n_col = shape[2]
+    # n_led = shape[3]
+    # for i, this_tissue in enumerate(tissue):
+    #     for j in range(n_led):
+    #         isxrgb.show_rgb_frame(rgb_s[this_tissue][:, :, :, j], clim=[0, 5000])
+    #         plt.suptitle('{}, led{}'.format(this_tissue, j+1))
+    #
+    # isxrgb.show_rgb_frame(xyz)
 
-    isxrgb.show_rgb_frame(xyz)
-
-    plt.show()
 
     # compare the results with separate LED illumination data sets
 
