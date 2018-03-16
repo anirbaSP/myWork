@@ -1,3 +1,8 @@
+import isx
+import isxrgb
+import myplotmodules as mpm
+import mymodels as mm
+
 import os
 from os import listdir
 from os.path import isfile, join
@@ -10,11 +15,6 @@ import matplotlib.gridspec as gsp
 from PIL import Image
 import random
 from itertools import combinations
-
-import isx
-import isxrgb
-import myplotmodules as mpm
-import mymodels as mm
 
 analyze_example_frame = True
 analyze_time_pixel = False

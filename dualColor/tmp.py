@@ -1,3 +1,6 @@
+import isx
+import isxrgb
+
 import os
 from os import listdir
 from os.path import isfile, join
@@ -5,10 +8,6 @@ from os.path import isfile, join
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
-
-import isx
-import isxrgb
-
 
 def main():
 
