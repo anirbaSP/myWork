@@ -14,6 +14,8 @@ import sys
 import math
 import numpy as np
 from PIL import Image
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 import json
