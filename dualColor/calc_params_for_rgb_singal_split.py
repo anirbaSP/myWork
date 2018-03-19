@@ -1,4 +1,4 @@
-from __future__ import division
+# from __future__ import division
 
 import isx
 import isxrgb
@@ -24,8 +24,8 @@ correct_stray_light = False
 correct_bad_pixels = True
 n_select_pixels = 1000
 random_pixels = False
-time_range = [0, 1]  # second
-max_n_frame = 100
+time_range = [0, 300]  # second
+max_n_frame = 600
 
 root_dir_group_list = [['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-17', '20170717', 'tmp'],
                        ['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-17', '20170714', 'tmp']
@@ -230,7 +230,7 @@ def main():
     """
         load the json file and check the result
     """
-    filename = 'cssp_GcaMP.json'  #save_filename    #'cssp_RGeco_300s.json'    #
+    filename = 'cssp_GCaMP.json'  #save_filename    #'cssp_RGeco_300s.json'    #
     save_filename_with_path = '/ariel/data2/Sabrina/data/result/json/{}'.format(filename)
     view_calc_params_for_rgb_signal_split_result(save_filename_with_path)
 
@@ -246,8 +246,8 @@ def view_calc_params_for_rgb_signal_split_result(cssp_filename_with_path):
     """
 
     hist_range = [[None, None, None], [None, None, None]]
-    hist_range[0][1] = [0, 3000]
-    hist_range[0][2] = [0, 3000]
+    hist_range[0][1] = [0, 4000]
+    hist_range[0][2] = [0, 4000]
     with open(cssp_filename_with_path) as json_data:
         d = json.load(json_data)
 
