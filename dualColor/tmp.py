@@ -14,15 +14,15 @@ def main():
 
     isx.initialize()
 
-    # run_signal_split()
-    run_test_data()
+    run_signal_split()
+    # run_test_data()
     # run_exp_data()
     # spatial_bandpass_movie()
 
     isx.shutdown()
 
 def run_signal_split():
-    root_dir = '/Volumes/data2/Alice/NV3_DualColor/D_Lab/' \
+    root_dir = '/ariel/data2/Alice/NV3_DualColor/D_Lab/' \
                'Masa/20170816/led12'    #NV3_color_sensor_12bit/V3_71/20171127/led1'
     select_frames = [0, 100]
 
@@ -55,7 +55,7 @@ def run_signal_split():
     # write the xyz into a movie
 
     output_filename = 'xyz.isxd'
-    save_filename_with_path = '{}/result/isxd/{}'.format(os.getcwd(), output_filename)
+    save_filename_with_path = '/ariel/data2/Sabrina/data/result/isxd/{}'.format(output_filename)
     if os.path.exists(save_filename_with_path):
         os.remove(save_filename_with_path)
     frame_period = 50000
@@ -95,7 +95,7 @@ def run_signal_split():
 
 def run_test_data():
     root_dir = '/Users/Sabrina/git/myWork/dualColor/result/isxd'    #xyz.isxd'
-    #'/Volumes/data2/Sabrina/NV3_01_greenpixel_bitsdrop/'
+    #'/ariel/data2/Sabrina/NV3_01_greenpixel_bitsdrop/'
     filename = 'xyz.isxd'   #'v3-01_gr_0ff.isxd' #'v3-01_gb_0ff.isxd' #'v3-01_blue_0ff.isxd' #'v3-01_red_0ff.isxd' #'Movie_2018-01-30-12-53-38_red_only.isxd'  #'Movie_2018-01-30-12-56-08_blue_only.isxd'  #'img_2018-03-08-15-41-21 A80043050047 colorbars.tif' #'img_2018-03-08-15-43-46 A80043050039 colorbars.tif'
     # #'A80043050039.tif' #'Movie_2018-01-30-12-55-17_greenr_raw.isxd' #'Movie_2018-01-30-12-56-52_greenb_raw.isxd' #'both_green_fff_2016-02-11-14-15-10_raw.isxd' #
     select_frames = [0]
@@ -182,7 +182,7 @@ def run_test_data():
 
 
 def run_exp_data():
-    root_dir = '/Volumes/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3_71/20171127/led1'
+    root_dir = '/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3_71/20171127/led1'
     select_frames = [0]
 
     fn = [f for f in listdir(root_dir) if isfile(join(root_dir, f))]
@@ -209,7 +209,7 @@ def run_exp_data():
 
 
 def spatial_bandpass_movie():
-    root_dir = '/Volumes/data2/Alice/NV3_DualColor/K_Lab/Cohort1/SO171214A'
+    root_dir = '/ariel/data2/Alice/NV3_DualColor/K_Lab/Cohort1/SO171214A'
 
     fn = [f for f in listdir(root_dir) if isfile(join(root_dir, f))]
     print('{} files have been found, they are \n {}'.format(len(fn), fn))
