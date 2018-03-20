@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 
@@ -14,7 +16,7 @@ def split_axes(ax, n_axes, direction, gap=None, ratio=None):
     """
     if gap is None:
         gap = [0.1]
-    elif not isinstance(list, gap):
+    elif not isinstance(gap, list):
         gap = list(gap)
 
     if len(gap) == 1:

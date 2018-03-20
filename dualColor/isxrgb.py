@@ -435,6 +435,10 @@ def show_rgb_frame(rgb_frame, ax_list=None, clim=None, cmap=None, colorbar=None,
         colorbar = True
         share_colorbar = True
 
+    if clim is None or \
+            (isinstance(clim, list) and len(clim) == 2 and not any([isinstance(clim0, list) for clim0 in clim])):
+        clim = [clim] * 3
+
     if ax_list is None:
         fig = plt.figure(figsize=(10, 3))
         gs = plt.GridSpec(1, n_ch+1, width_ratios=[12, 12, 12, 1], wspace=0.1)
@@ -444,7 +448,7 @@ def show_rgb_frame(rgb_frame, ax_list=None, clim=None, cmap=None, colorbar=None,
 
     for i, hax in enumerate(ax_list[0:n_ch]):
         plt.sca(hax)
-        im = plt.imshow(rgb_frame[i, :, :], clim=clim, cmap=cmapp[i])  # cmap=plt.get_cmap('gray'),
+        im = plt.imshow(rgb_frame[i, :, :], clim=clim[i], cmap=cmapp[i])  # cmap=plt.get_cmap('gray'),
         # ax.set_aspect('equal')
         if cmap is None and colorbar and not share_colorbar:
             cb = plt.colorbar(im, ticks=clim)  #, location='right', orientation='vertical')

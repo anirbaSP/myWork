@@ -36,7 +36,7 @@ def main():
     isx.initialize()
 
     # input files
-    root_dir = ('/Volumes/data2/Alice/NV3_DualColor/D_Lab/' #NV3_color_sensor_12bit/'    #
+    root_dir = ('/ariel/data2/Alice/NV3_DualColor/D_Lab/' #NV3_color_sensor_12bit/'    #
                 'Masa/20170816/led2') #'/Scope_Autofluorescence/NV3-04/led2_0_gain1_coverOff')  #'V3-63/20170807/led2')  #'V3-17/20170714') #'V3-55/20170710') #'V3-55/V3_55_20170717') #'V3-75/20171127/led2') #'V3_39/20170807/led2')  #'V3-17/20170714')  #'Scope_Autofluorescence/NV3-04/led2_4_gain1_coverOff')  #NV3-04/led2_4_coverOff')  #
     # 'Scope_Autofluorescence/NV3-01/led2_0') #
     # root_dir = '/Users/Sabrina/workspace/data/pipeline_s'
