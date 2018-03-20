@@ -435,8 +435,9 @@ def show_rgb_frame(rgb_frame, ax_list=None, clim=None, cmap=None, colorbar=None,
         colorbar = True
         share_colorbar = True
 
-    if len(clim == 2):
-        clim = clim * 3
+    if clim is None or \
+            (isinstance(clim, list) and len(clim) == 2 and not any([isinstance(clim0, list) for clim0 in clim])):
+        clim = [clim] * 3
 
     if ax_list is None:
         fig = plt.figure(figsize=(10, 3))

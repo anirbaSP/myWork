@@ -245,9 +245,10 @@ def view_calc_params_for_rgb_signal_split_result(cssp_filename_with_path):
         :return:
     """
 
-    hist_range = [[None, None, None], [None, None, None]]
-    hist_range[0][1] = [0, 4000]
-    hist_range[0][2] = [0, 4000]
+    clim_list = [[None, None, None], [None, None, None]]
+    clim_list[0][1] = [0, 4000]
+    clim_list[0][2] = [0, 4000]
+    clim_list[1][0] = [8, 80]
     with open(cssp_filename_with_path) as json_data:
         d = json.load(json_data)
 
@@ -269,7 +270,7 @@ def view_calc_params_for_rgb_signal_split_result(cssp_filename_with_path):
         for led_idx in range(n_led):
             for ch_idx in range(n_ch):
                 hax0 = plt.subplot(gs[ch_idx, led_idx])
-                hax00 = mp.split_axes(hax0, 3, 'horizontal', ratio=[20, 1, 10], gap=[0.05, 0.2, 0])
+                hax00 = mp.split_axes(hax0, 3, 'horizontal', ratio=[20, 1, 10], gap=[0.1, 0.2, 0])
                 hax_im[ch_idx] = hax00[0]
                 hax_cb[ch_idx] = hax00[1]
                 hax_stat[ch_idx] = hax00[2]
@@ -280,8 +281,10 @@ def view_calc_params_for_rgb_signal_split_result(cssp_filename_with_path):
             """
             dd = np.array(d['rgb_frame_file_group_var'])[:, :, :, 0, led_idx]
             # isxrgb.show_rgb_frame(d['aff'][:, :, :, led_idx], ax_list=hax_im, cmap='jet')
-            isxrgb.show_rgb_frame(dd, ax_list=hax_im, cmap='jet')
+            isxrgb.show_rgb_frame(dd, ax_list=hax_im, cmap='jet', clim=clim_list[led_idx])
             for ch_idx in range(n_ch):
+                clim = hax_im[ch_idx].get_images()[0].get_clim()
+                print('this clim is {}'.format(clim))
                 """
                     show stat for each image
                 """
@@ -289,7 +292,7 @@ def view_calc_params_for_rgb_signal_split_result(cssp_filename_with_path):
                 tmp = dd[ch_idx, :, :].flatten()
                 # tmp = (tmp - np.mean(tmp))/np.std(tmp)
 
-                plt.hist(tmp, 200,  normed=0, facecolor=ch[ch_idx], orientation='horizontal', range=hist_range[led_idx][ch_idx])
+                plt.hist(tmp, 200,  normed=0, facecolor=ch[ch_idx], orientation='horizontal', range=clim)
                 plt.autoscale(tight=True)
 
                 # if ch_idx or led_idx:
@@ -321,7 +324,11 @@ def view_calc_params_for_rgb_signal_split_result(cssp_filename_with_path):
                 #     hax_im[ch_idx].set_yticks([])
                 # cbar.ax.yaxis.set_ticklabels(ticklabels)
 
-                hax_im[ch_idx].set_ylabel('var', color=ch[ch_idx])   #'Param'
+                hax_cb[ch_idx].set_ylabel('var', color=ch[ch_idx])   #'Param'
+                hax_cb[ch_idx].yaxis.set_label_coords(-1.5, 0.5)
+                # print('yaxis label coords is {}'. format(hax_cb[ch_idx].yaxis.get_label_coords()))
+                # hax_cb[ch_idx].yaxis.get_label().set_position((-1000, 0.5))
+                print('yaxis label position is {}'. format(hax_cb[ch_idx].yaxis.get_label().get_position()))
                 # hax_cb[ch_idx].set_ylabel('param', color=ch[ch_idx])
                 # hax_cb[ch_idx].yaxis.set_label_position('left')
 
