@@ -17,7 +17,7 @@ def main():
     # generate_meanProj_subBg_files(root_dir, save_path, 'red')
     # generate_meanProj_subBg_files(root_dir, save_path, 'green')
 
-    mouse_subdir = ['mouse8', 'mouse9']
+    mouse_subdir = ['mouse15', 'mouse20', 'mouse30', 'mouse31']
     match_red_to_green(save_path, mouse_subdir)
 
     plt.show()
@@ -75,9 +75,11 @@ def match_red_to_green(pathname, mouse_subdir):
         """
         # prepare figure
         fig = plt.figure(figsize=(8, 5))  # (7, 10))
-        gs = plt.GridSpec(3, 3)
+        p_row = 3
+        p_col = 4
+        gs = plt.GridSpec(p_row, p_col)
         count = 0
-        hax = [([0] * 3) for i in range(3)]
+        hax = [([0] * p_col) for i in range(p_row)]
 
         # get and show green image
         tmp = Image.open(fn_green_with_path[0])
@@ -107,8 +109,8 @@ def match_red_to_green(pathname, mouse_subdir):
             im_r_stack[:, :, j] = im0
             tmp.close()
 
-            row = count // 3
-            col = count % 3
+            row = count // p_col
+            col = count % p_col
             hax[row][col] = plt.subplot(gs[row, col])
             plt.colorbar()
             count += 1
