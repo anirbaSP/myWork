@@ -262,7 +262,7 @@ def view_calc_params_for_rgb_signal_split_result(cssp_filename_with_path):
         n_led = shape[3]
 
         fig = plt.figure(figsize=(8, 5))  # (7, 10))
-        gs = plt.GridSpec(n_ch, n_led, wspace=0.4)
+        gs = plt.GridSpec(n_ch, n_led, wspace=0.4, left=0.05, right=0.88)
         hax_im = [0 for i in range(n_ch)]
         hax_cb = [0 for i in range(n_ch)]
         hax_stat = [0 for i in range(n_ch)]
@@ -270,7 +270,7 @@ def view_calc_params_for_rgb_signal_split_result(cssp_filename_with_path):
         for led_idx in range(n_led):
             for ch_idx in range(n_ch):
                 hax0 = plt.subplot(gs[ch_idx, led_idx])
-                hax00 = mp.split_axes(hax0, 3, 'horizontal', ratio=[20, 1, 10], gap=[0.1, 0.2, 0])
+                hax00 = mp.split_axes(hax0, 3, 'horizontal', ratio=[20, 1, 10], gap=[0.1, 0.23, 0])
                 hax_im[ch_idx] = hax00[0]
                 hax_cb[ch_idx] = hax00[1]
                 hax_stat[ch_idx] = hax00[2]
@@ -328,13 +328,16 @@ def view_calc_params_for_rgb_signal_split_result(cssp_filename_with_path):
                 hax_cb[ch_idx].yaxis.set_label_coords(-1.5, 0.5)
                 # print('yaxis label coords is {}'. format(hax_cb[ch_idx].yaxis.get_label_coords()))
                 # hax_cb[ch_idx].yaxis.get_label().set_position((-1000, 0.5))
-                print('yaxis label position is {}'. format(hax_cb[ch_idx].yaxis.get_label().get_position()))
+                # print('yaxis label position is {}'. format(hax_cb[ch_idx].yaxis.get_label().get_position()))
                 # hax_cb[ch_idx].set_ylabel('param', color=ch[ch_idx])
                 # hax_cb[ch_idx].yaxis.set_label_position('left')
 
+                if led_idx == 0:
+                    hax_im[ch_idx].set_ylabel(ch[ch_idx], color=ch[ch_idx])  # 'Param'
+
         filename = os.path.basename(cssp_filename_with_path)
         basename = os.path.splitext(filename)[0]
-        figure_title = '{} pixel-based variance across time'.format(basename)   #parameters
+        figure_title = '{} pixel-based variance across time, Mice V3-17'.format(basename)   #parameters
         plt.suptitle(figure_title)
         plt.savefig('{}/result/figure/{}'.format(os.getcwd(), basename), dpi=300, facecolor='w', edgecolor='w',
                     orientation='portrait', papertype=None, format=None,
