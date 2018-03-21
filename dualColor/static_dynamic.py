@@ -19,6 +19,7 @@ isx.initialize()
 for i, thisfile in enumerate(fn):
     mov = isx.Movie(join(root_dir, thisfile))
     n_frame = mov.num_frames
+    n_frame = min(n_frame, 1000)
     shape = mov.shape
     n_row = shape[0]
     n_col = shape[1]
@@ -33,6 +34,10 @@ for i, thisfile in enumerate(fn):
     im = Image.fromarray(mov_mean)
     thisfile_basename= splitext(thisfile)[0]
     im.save(join(save_path, thisfile_basename + '.tif'))
+    print('the {}th file {} is completed'.format(i, thisfile))
+    mov.close()
+    im.close()
+isx.shutdown()
 
 
 
