@@ -16,17 +16,22 @@ def main():
 
     # generate_meanProj_subBg_files(root_dir, save_path, 'red')
     # generate_meanProj_subBg_files(root_dir, save_path, 'green')
+    # generate_meanProj_subBg_files(root_dir, save_path, 'green', dff=True)
 
     mouse_subdir = ['mouse15', 'mouse20', 'mouse30', 'mouse31']
     match_red_to_green(save_path, mouse_subdir)
 
     plt.show()
 
-def generate_meanProj_subBg_files(root_dir, save_path, channel):
+def generate_meanProj_subBg_files(root_dir, save_path, channel, dff=None):
 
     """
         get mean intensity projection image for all red and green images
     """
+
+    if dff is None:
+        dff = False
+
     fn = [f for f in listdir(root_dir) if (isfile(join(root_dir, f)) and '_{}.isxd'.format(channel) in f)]
     print('{} files have been found, they are \n {}'.format(len(fn), fn))
 
@@ -41,13 +46,20 @@ def generate_meanProj_subBg_files(root_dir, save_path, channel):
         tmp = np.empty([n_row, n_col, n_frame])
         for j in range(n_frame):
             tmp[:, :, j] = mov.read_frame(j)
+
         mov_mean = np.mean(tmp, axis=2)
 
-        mov_mean_median = np.median(mov_mean.flatten())
-        mov_mean = mov_mean - mov_mean_median
+        if dff:
+            mov_dff = np.divide(tmp, mov_mean[:, :, np.newaxis])
+            mov_dff_max = np.max(mov_dff, axis=2)
+            im = Image.fromarray(mov_dff_max)
+            thisfile_basename = '{}_dff'.format(splitext(thisfile)[0])
+        else:
+            mov_mean_median = np.median(mov_mean.flatten())
+            mov_mean = mov_mean - mov_mean_median
+            im = Image.fromarray(mov_mean)
+            thisfile_basename = splitext(thisfile)[0]
 
-        im = Image.fromarray(mov_mean)
-        thisfile_basename = splitext(thisfile)[0]
         im.save(join(save_path, thisfile_basename + '.tif'))
         print('the {}th file {} is completed'.format(i, thisfile))
         mov.close()
@@ -62,14 +74,13 @@ def match_red_to_green(pathname, mouse_subdir):
     """
     for i, thismouse_subdir in enumerate(mouse_subdir):
         thismouse_path = join(pathname, thismouse_subdir)
-        fn_green = [f for f in listdir(thismouse_path) if (isfile(join(thismouse_path, f)) and '_green.tif' in f)]
+        fn_green = [f for f in listdir(thismouse_path) if (isfile(join(thismouse_path, f)) and '_green_dff.tif' in f)]
         fn_red = [f for f in listdir(thismouse_path) if (isfile(join(thismouse_path, f)) and '_red.tif' in f)]
         print('{} Green file is {}'.format(len(fn_green), fn_green))
         print('{} Red files are {}'.format(len(fn_red), fn_red))
 
         fn_green_with_path = [join(thismouse_path, file) for file in fn_green]
         fn_red_with_path = [join(thismouse_path, file) for file in fn_red]
-
         """
         prepare figure to show the red and green image
         """
