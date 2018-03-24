@@ -50,7 +50,7 @@ def generate_meanProj_subBg_files(root_dir, save_path, channel, dff=None):
         mov_mean = np.mean(tmp, axis=2)
 
         if dff:
-            mov_dff = np.divide(tmp, mov_mean[:, :, np.newaxis])
+            mov_dff = np.divide(np.subtract(tmp, mov_mean[:, :, np.newaxis]), mov_mean[:, :, np.newaxis])
             mov_dff_max = np.max(mov_dff, axis=2)
             im = Image.fromarray(mov_dff_max)
             thisfile_basename = '{}_dff'.format(splitext(thisfile)[0])
@@ -85,7 +85,7 @@ def match_red_to_green(pathname, mouse_subdir):
         prepare figure to show the red and green image
         """
         # prepare figure
-        fig = plt.figure(figsize=(8, 5))  # (7, 10))
+        fig = plt.figure(figsize=(20, 12))  # (7, 10))
         p_row = 3
         p_col = 4
         gs = plt.GridSpec(p_row, p_col)
@@ -103,7 +103,7 @@ def match_red_to_green(pathname, mouse_subdir):
         hax[0][0] = plt.subplot(gs[0, 0])
         count += 1
         plt.sca(hax[0][0])
-        plt.imshow(im_g, cmap='jet')
+        plt.imshow(im_g, cmap='gray', clim=[0.05, 0.2])
         plt.colorbar()
 
         n_row = im_g.shape[0]
@@ -123,10 +123,10 @@ def match_red_to_green(pathname, mouse_subdir):
             row = count // p_col
             col = count % p_col
             hax[row][col] = plt.subplot(gs[row, col])
-            plt.colorbar()
             count += 1
             plt.sca(hax[row][col])
-            plt.imshow(im_r_stack[:, :, j], cmap='jet')
+            plt.imshow(im_r_stack[:, :, j], cmap='gray', clim=[-500, 2000])
+            plt.colorbar()
 
 
 if __name__ == '__main__': main()

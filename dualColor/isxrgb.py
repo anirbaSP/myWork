@@ -133,7 +133,7 @@ def rgb_signal_split(rgb, exp):
     return rgb_s, xyz
 
 
-def discard_bad_pixels(rgb):  #todo: test pattern files are not fully implemented yet
+def discard_bad_pixels(rgb):
     """
         NV3-01 microscope has pixels with dropping bits therefor the reading is not correct. This function can discard
         bad pixels. In order to recognize bad pixels, test patterns have been acquired ahead of time and the files were
@@ -229,6 +229,69 @@ def find_rgb_channels(fn, channel_list=None):  # find the files for RGB channels
     rgb_files_root = rgb_files_root[:-1]
 
     return rgb_files, rgb_files_root
+
+
+def find_rgb_files(basename_with_path, channel_list=None):
+
+    """
+        Use rgb file basename to find files for all channels
+    :param basename_with_path:
+    :param channel_list: default ['red', 'green', 'blue']
+    :return:
+    """
+
+    from os.path import split, isfile
+
+    if channel_list is None:
+        channel_list = ['red', 'green', 'blue']
+    n_ch = len(channel_list)
+
+    tmp = split(basename_with_path)
+    pathname = tmp[0]
+    basename = tmp[1]
+
+    rgb_files_with_path = [0]*n_ch
+    for i in range(n_ch):
+        rgb_files_with_path[i] = '{}_{}'.format(basename_with_path, channel_list[i])
+        if not isfile(rgb_files_with_path[i]):
+            return 'rgb file for {] channel does not exist'.format(channel_list[i])
+
+    return rgb_files_with_path
+
+
+def get_movie_header(rgb_files_with_path):
+    """
+        get the movie "header" info
+    :param rgb_files_with_path:
+    :return: size(n_row, n_col, n_frame), and frame_rate
+    """
+    from os.path import splitext
+    from PIL import Image
+    # open one channel first to get the basics of the movie
+    ext = splitext(rgb_files_with_path[0])[1]
+
+    if ext == '.isxd':
+        tmp = isx.Movie(rgb_files_with_path[0])
+        frame_shape = tmp.shape
+        n_pixels = frame_shape[0] * frame_shape[1]
+        n_frames = tmp.num_frames
+        frame_rate = tmp.frame_rate
+        tmp.close()
+    elif ext == '.tif':
+        tmp = Image.open(rgb_files_with_path[0])
+        frame_shape = tmp.size[::-1]
+        n_pixels = frame_shape[0] * frame_shape[1]
+        n_frames = tmp.n_frames
+        frame_rate = 20  # tmp.frame_rate #todo: does the tif file always have frame rate info? what's the tag name??
+        tmp.close()
+
+    # get an example frame to get accurate frame_shape (especially necessary when correct_bad_pixels == True
+    tmp = get_rgb_frame(rgb_files_with_path, 0, correct_stray_light=correct_stray_light,
+                        correct_bad_pixels=correct_bad_pixels)
+    frame_shape = tmp.shape[1:3]
+    size = [frame_shape[0], frame_shape[1], n_frames]
+
+    return size, frame_rate
 
 
 def get_exp_label(exp_file_root):   #todo: perhaps need to re-structure the create_LOOKUP_exp_label file
@@ -405,6 +468,80 @@ def calc_rgb_ratio(rgb_data, ch=None):
         rgb_ratio[i, :, :] = rgb_data[pair_list[i][0]] / rgb_data[pair_list[i][1]]
 
     return rgb_ratio, pair_list
+
+
+def write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=None,
+                     correct_stray_light=None, correct_bad_pixels=None):
+    """
+        Write GCaMP and RGeco movie after color signal splitting.
+
+    :param rgb_files_with_path:
+    :param save_path:
+    :param save_filename:
+    :return:
+    """
+    from os.path import dirname, basename, splitext, join
+    import numpy as np
+    from PIL import Image
+
+    if save_pathname is None:
+        save_pathname = dirname(rgb_filename_with_path)
+    if save_filename is None:
+        save_filename = basename(rgb_filename_with_path)
+    if correct_stray_light is None:
+        correct_stray_light = False
+    if correct_bad_pixels is None:
+        correct_bad_pixels = False
+
+    rgb_files_with_path = find_rgb_files(rgb_filename_with_path)
+
+    size, frame_rate = get_movie_header(rgb_files_with_path)
+    n_row = size[0]
+    n_col = size[1]
+    n_frame = size[2]
+    n_ch = len(rgb_files_with_path)
+    rgb_frame = np.array([n_ch, n_row, n_col])
+    for frame_idx in range(n_frame):
+        rgb_frame = get_rgb_frame(rgb_files_with_path, frame_idx, correct_stray_light=correct_stray_light,
+                      correct_bad_pixels=correct_bad_pixels)
+
+    # todo: call calc_aMatrix_for_rgb_signal_split
+
+
+def calc_aMatrix_for_rgb_signal_split(pled, cssp=None):
+    """
+    load parameters for color signal spliting files cssp_GCaMP.json, cssp_RGeco.json, and cssp_Autofluo.json, and
+        calculate the matraix for rgb signal spliting with the parameters a and led power
+    :param pled: a two element list of led power, [p_blueLED, p_LimeLED]
+    :param cssp: a dictionaly
+    :return: aM is a n_ch-by-n_probe matrix for color signal splitting
+    """
+    import json
+    import numpy as np
+    if cssp is None:
+        cssp['GCaMP'] = 'cssp_GCaMP.json'
+        cssp['RGeco'] = 'cssp_RGeco.json'
+        cssp['Autofluo'] = 'cssp_Autofluo.json'
+
+    probe = list(cssp.keys())
+    assert probe == ['GCaMP', 'RGeco', 'Autofluo']
+
+    n_ch = 3
+    n_probe = 3
+    aM = np.array([n_ch, n_probe])
+    for i, thisprobe in enumerate(probe):
+        d = json.load(cssp[thisprobe])
+        led = d['led']
+        ch = d['channel']
+        dimension_name = d['dimension_name']
+        # todo: error if it's not as asserted
+        assert led == ['blue', 'lime']
+        assert ch == ['red', 'green', 'blue']
+        assert dimension_name == ['channel', 'led']
+        a = np.array(d['a'])
+        aM[:, i] = a*np.pled
+
+    return aM
 
 
 def show_rgb_frame(rgb_frame, ax_list=None, clim=None, cmap=None, colorbar=None, share_colorbar=None):
