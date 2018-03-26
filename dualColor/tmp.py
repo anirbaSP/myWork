@@ -21,57 +21,12 @@ def main():
     isx.shutdown()
 
 def run_signal_split():
-    root_dir = '/ariel/data2/Alice/NV3_DualColor/D_Lab/' \
-               'Masa/20170816/led12'    #NV3_color_sensor_12bit/V3_71/20171127/led1'
-    select_frames = [0, 100]
+    root_dir = '/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3_71/20171127/led12' # D_Lab/Masa/20170816/led12'
+    rgb_file_basename = 'Movie_2017-11-27-11-56-39'
+    rgb_filename_with_path = join(root_dir, rgb_file_basename)
 
-    fn = [f for f in listdir(root_dir) if isfile(join(root_dir, f))]
-    print('{} files have been found, they are \n {}'.format(len(fn), fn))
-
-    # find the rgb channel, and sort fn as r/g/b
-    rgb_files, rgb_files_root = isxrgb.find_rgb_channels(fn)
-    print('rgb files are \n {}'.format(rgb_files))
-
-    rgb_files_with_path = [os.path.join(root_dir, file) for file in rgb_files]
-
-    for i, frame_idx in enumerate(select_frames):
-        this_frame = isxrgb.get_rgb_frame(rgb_files_with_path, frame_idx, correct_bad_pixels=True)
-        if i == 0:
-            shape = this_frame.shape
-            stack = np.empty([shape[0], shape[1], shape[2], len(select_frames)])
-        stack[:, :, :, i] = this_frame
-
-    # plt.figure()
-    # plt.imshow(stack[1, :, :, 0])
-
-    # figure_name = 'x_all'
-    # plt.savefig(figure_name)
-
-    rgb_files_root = isxrgb.find_rgb_channels(rgb_files)[1]
-    rgb_files_root = os.path.split(rgb_files_root)[1]
-    exp = isxrgb.get_exp_label(rgb_files_root)
-
-    # write the xyz into a movie
-
-    output_filename = 'xyz.isxd'
-    save_filename_with_path = '/ariel/data2/Sabrina/data/result/isxd/{}'.format(output_filename)
-    if os.path.exists(save_filename_with_path):
-        os.remove(save_filename_with_path)
-    frame_period = 50000
-
-    isx.initialize()
-    output_mov = isx.Movie(save_filename_with_path, frame_period=frame_period, shape=shape[1:3],
-                           num_frames=len(select_frames), data_type=np.uint16)
-
-    for i, frame_idx in enumerate(select_frames):
-        rgb_s, xyz = isxrgb.rgb_signal_split(stack[:, :, :, i], exp)
-        xyz[xyz<0] = 0
-        gcamp = xyz[0, :, :]
-        output_mov.write_frame(gcamp, i)
-
-    output_mov.close()
-
-    isx.shutdown()
+    isxrgb.write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=None,
+                     correct_stray_light=None, correct_bad_pixels=True)
 
 
     # show the result

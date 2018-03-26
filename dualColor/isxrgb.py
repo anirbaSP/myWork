@@ -82,55 +82,39 @@ def get_rgb_frame(rgb_files, frame_idx, camera_bias=None, correct_stray_light=No
     return rgb_frame
 
 
-def rgb_signal_split(rgb, exp):
-    import os
-    import json
+def rgb_signal_split(rgb, aM_inv):
+    """
+        apply aM_inv to the raw rgb frame to get XYZ for the frame
+    :param rgb:
+    :param aM_inv:
+    :return:
+    """
     import numpy as np
 
-    led = ['Blue', 'Lime']
-    n_led = 2
-    p = np.empty(n_led) #p: led power
-    for i in range(n_led):
-        p[i] = exp[led[i]]
-
-    tissue = ['GCaMP', 'RGeco', 'Autofluo']
-    n_tissue = len(tissue)
-    cssp_filename_with_path = [None] * n_tissue
-    cssp = [None] * n_tissue
-    for i in range(n_tissue):
-        cssp_filename_with_path[i] = os.path.join(os.getcwd(), 'result', 'json', 'cssp_{}.json'.format(tissue[i]))
-        cssp[i] = json.load(open(cssp_filename_with_path[i]))
-
-    shape = rgb.shape
-    n_ch = shape[0]
-    n_row = shape[1]
-    n_col = shape[2]
+    n_ch = rgb.shape[0]
+    n_row = rgb.shape[1]
+    n_col = rgb.shape[2]
     n_pixel = n_row * n_col
+    assert aM_inv.shape[0] == n_ch
+    n_probe = aM_inv.shape[1]
 
     # r_alpha, r_beta, r_gama, 
     # g_alpha, g_beta, g_gama, 
     # b_alpha, b_beta, b_gama
-    q = np.empty([n_ch, n_tissue, n_led])
-    for i in range(n_ch):
-        for j in range(n_tissue):
-                q[i, j, :] = np.multiply(p, cssp[j]['a'][i])
-                
-    qq = np.sum(q, axis=2)
-    qq_inv = np.linalg.inv(qq)
 
-    rgb_s = {this_tissue: np.empty([n_ch, n_pixel, n_led]) for this_tissue in tissue}
-    xyz = np.empty([n_tissue, n_pixel])
+    # rgb_s = np.empty([n_ch, n_pixel, n_led, n_probe])
+    xyz = np.empty([n_probe, n_pixel])
     for i in range(n_pixel):
-        tmp = np.matmul(qq_inv, rgb.reshape([n_ch, n_pixel])[:, i])
-        for j, this_tissue in enumerate(tissue):
-            rgb_s[this_tissue][:, i, :] = np.multiply(q[:, j, :], tmp[j])
+        tmp = np.matmul(aM_inv, rgb.reshape([n_ch, n_pixel])[:, i])
+        # for j, this_probe in enumerate(probe):
+        #     rgb_s[:, :, :, i][:, i, :] = np.multiply(q[:, j, :], tmp[j])
         xyz[:, i] = tmp
 
     # reshape pixels back to image
-    for j, this_tissue in enumerate(tissue):
-        rgb_s[this_tissue] = rgb_s[this_tissue].reshape([n_ch, n_row, n_col, n_led])
-    xyz = xyz.reshape([n_tissue, n_row, n_col])
-    return rgb_s, xyz
+    # for j, this_probe in enumerate(probe):
+    #     rgb_s[this_probe] = rgb_s[this_probe].reshape([n_ch, n_row, n_col, n_led])
+    xyz = xyz.reshape([n_probe, n_row, n_col])
+    return xyz
 
 
 def discard_bad_pixels(rgb):
@@ -252,14 +236,14 @@ def find_rgb_files(basename_with_path, channel_list=None):
 
     rgb_files_with_path = [0]*n_ch
     for i in range(n_ch):
-        rgb_files_with_path[i] = '{}_{}'.format(basename_with_path, channel_list[i])
+        rgb_files_with_path[i] = '{}_{}.isxd'.format(basename_with_path, channel_list[i])    #todo:
         if not isfile(rgb_files_with_path[i]):
-            return 'rgb file for {] channel does not exist'.format(channel_list[i])
+            return 'rgb file for {} channel does not exist'.format(channel_list[i])
 
     return rgb_files_with_path
 
 
-def get_movie_header(rgb_files_with_path):
+def get_movie_header(rgb_files_with_path, correct_bad_pixels, correct_stray_light):  #todo: rewrite to change it as a class
     """
         get the movie "header" info
     :param rgb_files_with_path:
@@ -272,26 +256,26 @@ def get_movie_header(rgb_files_with_path):
 
     if ext == '.isxd':
         tmp = isx.Movie(rgb_files_with_path[0])
-        frame_shape = tmp.shape
-        n_pixels = frame_shape[0] * frame_shape[1]
-        n_frames = tmp.num_frames
+        # frame_shape = tmp.shape
+        num_frames = tmp.num_frames
         frame_rate = tmp.frame_rate
+        frame_period = tmp.get_frame_period()
+        data_type = tmp.data_type
         tmp.close()
     elif ext == '.tif':
         tmp = Image.open(rgb_files_with_path[0])
-        frame_shape = tmp.size[::-1]
-        n_pixels = frame_shape[0] * frame_shape[1]
-        n_frames = tmp.n_frames
+        # frame_shape = tmp.size[::-1]
+        num_frames = tmp.n_frames
         frame_rate = 20  # tmp.frame_rate #todo: does the tif file always have frame rate info? what's the tag name??
+        frame_period = 50000
         tmp.close()
 
     # get an example frame to get accurate frame_shape (especially necessary when correct_bad_pixels == True
     tmp = get_rgb_frame(rgb_files_with_path, 0, correct_stray_light=correct_stray_light,
                         correct_bad_pixels=correct_bad_pixels)
     frame_shape = tmp.shape[1:3]
-    size = [frame_shape[0], frame_shape[1], n_frames]
 
-    return size, frame_rate
+    return frame_shape, num_frames, frame_period, data_type
 
 
 def get_exp_label(exp_file_root):   #todo: perhaps need to re-structure the create_LOOKUP_exp_label file
@@ -480,14 +464,28 @@ def write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=N
     :param save_filename:
     :return:
     """
-    from os.path import dirname, basename, splitext, join
+    from os.path import dirname, basename, exists, join
+    from os import remove
     import numpy as np
-    from PIL import Image
+
+    rgb_files_basename = basename(rgb_filename_with_path)
+
+    # todo: rewrite get_exp_label function, make it as a class with method like exp.led, exp.probe
+    # exp = get_exp_label(rgb_files_basename)
+    # exp.led.blue = 1
+    # exp.led.lime = 0.5
+    # exp.probe = ['GCaMP', 'RGeco']
+    # aM = calc_aMatrix_for_rgb_signal_split(exp.probe, exp.led, cssp=None)
+    exp_led = [1.8, 0.9]
+    exp_probe = ['GCaMP', 'RGeco', 'Autofluo']
+    aM = calc_aMatrix_for_rgb_signal_split(exp_led, cssp=None)
+    aM_inv = np.linalg.inv(aM)
 
     if save_pathname is None:
         save_pathname = dirname(rgb_filename_with_path)
     if save_filename is None:
-        save_filename = basename(rgb_filename_with_path)
+        save_filename_with_path = [join(save_pathname, '{}_{}.isxd'.format(rgb_files_basename, probe))
+                                   for probe in exp_probe]
     if correct_stray_light is None:
         correct_stray_light = False
     if correct_bad_pixels is None:
@@ -495,18 +493,34 @@ def write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=N
 
     rgb_files_with_path = find_rgb_files(rgb_filename_with_path)
 
-    size, frame_rate = get_movie_header(rgb_files_with_path)
-    n_row = size[0]
-    n_col = size[1]
-    n_frame = size[2]
-    n_ch = len(rgb_files_with_path)
-    rgb_frame = np.array([n_ch, n_row, n_col])
+    shape, num_frames, frame_period, data_type = get_movie_header(rgb_files_with_path,
+                                                                  correct_bad_pixels, correct_stray_light)
+    n_row = shape[0]
+    n_col = shape[1]
+    n_pixel = n_row * n_col
+    n_frame = num_frames
+    n_ch = 3
+    n_probe = len(exp_probe)
+
+    isx.initialize()
+    # output_mov_list = list
+    for i in range(n_probe):
+        if exists(save_filename_with_path[i]):
+            remove(save_filename_with_path[i])
+    output_mov_list = isx.Movie(save_filename_with_path[0], frame_period=frame_period, shape=shape, num_frames=num_frames, data_type=data_type)
     for frame_idx in range(n_frame):
         rgb_frame = get_rgb_frame(rgb_files_with_path, frame_idx, correct_stray_light=correct_stray_light,
-                      correct_bad_pixels=correct_bad_pixels)
+                                  correct_bad_pixels=correct_bad_pixels)
+        xyz = rgb_signal_split(rgb_frame, aM_inv)
+        xyz[xyz < 0] = 0
+        # for i in range(n_probe):
+        output_mov_list.write_frame(xyz[0, :, :], frame_idx)
+        print('...{}'.format(frame_idx))
 
-    # todo: call calc_aMatrix_for_rgb_signal_split
+    # for i in range(exp_probe):
+    output_mov_list.close()
 
+    isx.shutdown()
 
 def calc_aMatrix_for_rgb_signal_split(pled, cssp=None):
     """
@@ -519,27 +533,29 @@ def calc_aMatrix_for_rgb_signal_split(pled, cssp=None):
     import json
     import numpy as np
     if cssp is None:
-        cssp['GCaMP'] = 'cssp_GCaMP.json'
-        cssp['RGeco'] = 'cssp_RGeco.json'
-        cssp['Autofluo'] = 'cssp_Autofluo.json'
+        cssp = {}
+        cssp['GCaMP'] = '/localhome/psxu/git/myWork/dualColor/result/json/cssp_GCaMP.json'
+        cssp['RGeco'] = '/localhome/psxu/git/myWork/dualColor/result/json/cssp_RGeco.json'
+        cssp['Autofluo'] = '/localhome/psxu/git/myWork/dualColor/result/json/cssp_Autofluo.json'
 
     probe = list(cssp.keys())
     assert probe == ['GCaMP', 'RGeco', 'Autofluo']
 
     n_ch = 3
     n_probe = 3
-    aM = np.array([n_ch, n_probe])
+    aM = np.empty([n_ch, n_probe])
     for i, thisprobe in enumerate(probe):
-        d = json.load(cssp[thisprobe])
+        with open(cssp[thisprobe]) as json_data:
+            d = json.load(json_data)
         led = d['led']
         ch = d['channel']
         dimension_name = d['dimension_name']
         # todo: error if it's not as asserted
-        assert led == ['blue', 'lime']
+        assert led == ['Blue', 'Lime']
         assert ch == ['red', 'green', 'blue']
         assert dimension_name == ['channel', 'led']
         a = np.array(d['a'])
-        aM[:, i] = a*np.pled
+        aM[:, i] = np.matmul(a, np.transpose(pled))
 
     return aM
 
