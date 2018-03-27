@@ -79,41 +79,6 @@ def get_rgb_frame(rgb_files, frame_idx, camera_bias=None, correct_stray_light=No
     return rgb_frame
 
 
-def rgb_signal_split(rgb, aM_inv):
-    """
-        apply aM_inv to the raw rgb frame to get XYZ for the frame
-    :param rgb:
-    :param aM_inv:
-    :return:
-    """
-    import numpy as np
-
-    n_ch = rgb.shape[0]
-    n_row = rgb.shape[1]
-    n_col = rgb.shape[2]
-    n_pixel = n_row * n_col
-    assert aM_inv.shape[0] == n_ch
-    n_probe = aM_inv.shape[1]
-
-    # r_alpha, r_beta, r_gama, 
-    # g_alpha, g_beta, g_gama, 
-    # b_alpha, b_beta, b_gama
-
-    # rgb_s = np.empty([n_ch, n_pixel, n_led, n_probe])
-    xyz = np.empty([n_probe, n_pixel])
-    for i in range(n_pixel):
-        tmp = np.matmul(aM_inv, rgb.reshape([n_ch, n_pixel])[:, i])
-        # for j, this_probe in enumerate(probe):
-        #     rgb_s[:, :, :, i][:, i, :] = np.multiply(q[:, j, :], tmp[j])
-        xyz[:, i] = tmp
-
-    # reshape pixels back to image
-    # for j, this_probe in enumerate(probe):
-    #     rgb_s[this_probe] = rgb_s[this_probe].reshape([n_ch, n_row, n_col, n_led])
-    xyz = xyz.reshape([n_probe, n_row, n_col])
-    return xyz
-
-
 def discard_bad_pixels(rgb):
     """
         NV3-01 microscope has pixels with dropping bits therefor the reading is not correct. This function can discard
@@ -447,6 +412,42 @@ def calc_rgb_ratio(rgb_data, ch=None):
     return rgb_ratio, pair_list
 
 
+def rgb_signal_split(rgb, aM_inv):
+    """
+        apply aM_inv to the raw rgb frame to get XYZ for the frame
+    :param rgb:
+    :param aM_inv:
+    :return:
+    """
+    import numpy as np
+
+    n_ch = rgb.shape[0]
+    n_row = rgb.shape[1]
+    n_col = rgb.shape[2]
+    n_pixel = n_row * n_col
+    assert aM_inv.shape[0] == n_ch
+    n_probe = aM_inv.shape[1]
+
+    # r_alpha, r_beta, r_gama,
+    # g_alpha, g_beta, g_gama,
+    # b_alpha, b_beta, b_gama
+
+    # rgb_s = np.empty([n_ch, n_pixel, n_led, n_probe])
+    xyz = np.empty([n_probe, n_pixel])
+    # for i in range(n_pixel):
+    xyz = np.matmul(aM_inv, rgb.reshape([n_ch, n_pixel]))
+        # for j, this_probe in enumerate(probe):
+        #     rgb_s[:, :, :, i][:, i, :] = np.multiply(q[:, j, :], tmp[j])
+        # xyz[:, i] = tmp
+
+    # reshape pixels back to image
+    # for j, this_probe in enumerate(probe):
+    #     rgb_s[this_probe] = rgb_s[this_probe].reshape([n_ch, n_row, n_col, n_led])
+    xyz = xyz.reshape([n_probe, n_row, n_col])
+
+    return xyz
+
+
 def write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=None,
                      correct_stray_light=None, correct_bad_pixels=None):
     """
@@ -477,8 +478,8 @@ def write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=N
     if save_pathname is None:
         save_pathname = dirname(rgb_filename_with_path)
     if save_filename is None:
-        save_filename_with_path = [join(save_pathname, '{}_{}.isxd'.format(rgb_files_basename, probe))
-                                   for probe in exp_probe]
+        save_filename = rgb_files_basename
+    save_filename_with_path = [join(save_pathname, '{}_{}.isxd'.format(save_filename, probe)) for probe in exp_probe]
     if correct_stray_light is None:
         correct_stray_light = False
     if correct_bad_pixels is None:
@@ -492,7 +493,7 @@ def write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=N
     n_col = shape[1]
     n_pixel = n_row * n_col
     n_frame = num_frames
-    n_ch = 3
+    n_ch = len(rgb_files_with_path)
     n_probe = len(exp_probe)
 
     output_mov_list = [0]*n_probe
@@ -527,9 +528,9 @@ def calc_aMatrix_for_rgb_signal_split(pled, cssp=None):
     import numpy as np
     if cssp is None:
         cssp = {}
-        cssp['GCaMP'] = '/localhome/psxu/git/myWork/dualColor/result/json/cssp_GCaMP.json'
-        cssp['RGeco'] = '/localhome/psxu/git/myWork/dualColor/result/json/cssp_RGeco.json'
-        cssp['Autofluo'] = '/localhome/psxu/git/myWork/dualColor/result/json/cssp_Autofluo.json'
+        cssp['GCaMP'] = '/ariel/data2/Sabrina/data/result/json/cssp_GCaMP.json'
+        cssp['RGeco'] = '/ariel/data2/Sabrina/data/result/json/cssp_RGeco.json'
+        cssp['Autofluo'] = '/ariel/data2/Sabrina/data/result/json/cssp_Autofluo.json'
 
     probe = list(cssp.keys())
     assert probe == ['GCaMP', 'RGeco', 'Autofluo']

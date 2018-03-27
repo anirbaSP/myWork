@@ -25,7 +25,7 @@ def run_signal_split():
     rgb_file_basename = 'Movie_2017-11-27-11-56-39'
     rgb_filename_with_path = join(root_dir, rgb_file_basename)
 
-    isxrgb.write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=None,
+    isxrgb.write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename='test',
                      correct_stray_light=None, correct_bad_pixels=True)
 
 
