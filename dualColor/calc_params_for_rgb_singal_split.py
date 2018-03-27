@@ -25,7 +25,7 @@ correct_bad_pixels = True
 n_select_pixels = 1000
 random_pixels = False
 time_range = [0, 300]  # second
-max_n_frame = 600
+max_n_frame = 20000
 
 root_dir_group_list = [['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-17', '20170717', 'tmp'],
                        ['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-17', '20170714', 'tmp']
@@ -39,193 +39,193 @@ root_dir_group_list = [['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit
 
 
 def main():
-    # file_index = 0
-    # # current only handle the first file in each group. todo: for multiple files
-    # for i in range(len(root_dir_group_list)):
-    #     root_dir_group_list[i] = root_dir_group_list[i][0:2]
-    #
-    # # isx.initialize()
-    # ch = ['red', 'green', 'blue']
-    # n_group = len(root_dir_group_list)
-    # max_n_file = max(len(this_group_root_dir_list) for this_group_root_dir_list in root_dir_group_list) - 1
-    # n_ch = len(ch)
-    #
-    # rgb_frame_file_group_info = []
-    # cur_short_recording = math.inf
-    # """
-    #     get file info first, if there is any input file info unexpected, we can error ahead of time
-    # """
-    # for group_idx, this_group_root_dir_list in enumerate(root_dir_group_list):
-    #     rgb_frame_file_group_info.append({})
-    #     rgb_frame_file_group_info[group_idx]['tissue'] = []
-    #     rgb_frame_file_group_info[group_idx]['microscope'] = []
-    #     rgb_frame_file_group_info[group_idx]['led_name'] = []
-    #     rgb_frame_file_group_info[group_idx]['led_power'] = []
-    #     rgb_frame_file_group_info[group_idx]['rgb_file_root_with_path'] = []
-    #     for file_idx in range(len(this_group_root_dir_list) - 1):
-    #         root_dir = os.path.join(this_group_root_dir_list[0], this_group_root_dir_list[file_idx + 1])
-    #         fn = [f for f in listdir(root_dir) if isfile(join(root_dir, f))]
-    #         print('{} files have been found, they are \n {}'.format(len(fn), fn))
-    #
-    #         # find the rgb channel, and sort fn as r/g/b
-    #         rgb_files, rgb_files_root = isxrgb.find_rgb_channels(fn)
-    #         print('rgb files are \n {}'.format(rgb_files))
-    #
-    #         """
-    #             get experiment info
-    #         """
-    #         exp = isxrgb.get_exp_label(rgb_files_root)
-    #         rgb_frame_file_group_info[group_idx]['led_power'].append(exp['led_power'])
-    #         rgb_frame_file_group_info[group_idx]['tissue'].append(exp['tissue'])
-    #         rgb_frame_file_group_info[group_idx]['microscope'].append(exp['microscope'])
-    #         rgb_frame_file_group_info[group_idx]['led_name'].append(exp['led_name'])
-    #         rgb_frame_file_group_info[group_idx]['rgb_file_root_with_path'] = os.path.join(root_dir, rgb_files_root)
-    #
-    #         """
-    #             Open each files and validate conditions before massive reading frames in the next step.
-    #             This step prepare for the massive file reading and stop the code if input files are not valid.
-    #         """
-    #         rgb_files_with_path = [os.path.join(root_dir, file) for file in rgb_files]
-    #
-    #         # open one channel first to get the frame numbers
-    #         ext = os.path.splitext(rgb_files_with_path[0])[1]
-    #
-    #         if ext == '.isxd':
-    #             tmp = isx.Movie(rgb_files_with_path[0])
-    #             n_frames = tmp.num_frames
-    #             frame_rate = tmp.frame_rate
-    #             tmp.close()
-    #         elif ext == '.tif':
-    #             tmp = Image.open(rgb_files_with_path[0])
-    #             n_frames = tmp.n_frames
-    #             frame_rate = tmp.frame_rate
-    #             tmp.close()
-    #
-    #         frame_range = np.array(time_range) * frame_rate
-    #         cur_short_recording = min(cur_short_recording, n_frames/frame_rate)
-    #         if frame_range[1] > n_frames:
-    #             sys.exit('time_range is too long, there is an input file '
-    #                      'lasting for {} seconds'.format(n_frames/frame_rate))
-    # print('The shortest recording last for {} seconds'.format(cur_short_recording))
-    #
-    # """
-    #     read image data
-    # """
-    # for group_idx, this_group_root_dir_list in enumerate(root_dir_group_list):
-    #     for file_idx in [file_idx]:   #range(len(this_group_root_dir_list) - 1):
-    #         root_dir = os.path.join(this_group_root_dir_list[0], this_group_root_dir_list[file_idx + 1])
-    #         fn = [f for f in listdir(root_dir) if isfile(join(root_dir, f))]
-    #         rgb_files, rgb_files_root = isxrgb.find_rgb_channels(fn)
-    #
-    #         rgb_files_with_path = [os.path.join(root_dir, file) for file in rgb_files]
-    #
-    #         # open one channel first to get the frame numbers
-    #         ext = os.path.splitext(rgb_files_with_path[0])[1]
-    #
-    #         if ext == '.isxd':
-    #             tmp = isx.Movie(rgb_files_with_path[0])
-    #             frame_shape = tmp.shape
-    #             n_pixels = frame_shape[0] * frame_shape[1]
-    #             n_frames = tmp.num_frames
-    #             frame_rate = tmp.frame_rate
-    #             tmp.close()
-    #         elif ext == '.tif':
-    #             tmp = Image.open(rgb_files_with_path[0])
-    #             frame_shape = tmp.size[::-1]
-    #             n_pixels = frame_shape[0] * frame_shape[1]
-    #             n_frames = tmp.n_frames
-    #             frame_rate = tmp.frame_rate
-    #             tmp.close()
-    #
-    #         # get an example frame to get accurate frame_shape
-    #         # (especially necessary when correct_bad_pixels == True
-    #         tmp = isxrgb.get_rgb_frame(rgb_files_with_path, 0, correct_stray_light=correct_stray_light,
-    #                                    correct_bad_pixels=correct_bad_pixels)
-    #         frame_shape = tmp.shape[1:3]
-    #         n_pixels = frame_shape[0] * frame_shape[1]
-    #
-    #         frame_range = np.array(time_range) * frame_rate
-    #         step = math.ceil(frame_range[1]/max_n_frame)
-    #         select_frame_idx = np.arange(frame_range[0], frame_range[1], step)
-    #         rgb_frame_stack = np.zeros((len(ch), frame_shape[0], frame_shape[1], len(select_frame_idx)))
-    #         print('Collect frame', end='')
-    #         for i, frameIdx in enumerate(select_frame_idx):
-    #             print('...', end='')
-    #             this_rgb_frame = isxrgb.get_rgb_frame(rgb_files_with_path, frameIdx,
-    #                                                   correct_stray_light=correct_stray_light,
-    #                                                   correct_bad_pixels=correct_bad_pixels)
-    #             rgb_frame_stack[:, :, :, i] = this_rgb_frame
-    #             print('frame {}'.format(frameIdx))
-    #
-    #         # calculate variance across time for R/G/B
-    #         rgb_frame_stack_var4time = np.var(rgb_frame_stack, axis=3)
-    #
-    #         # calculate average intensity across time for R/G/B
-    #         rgb_frame_stack_mean4time = np.mean(rgb_frame_stack, axis=3)
-    #         # rgb_frame_stack_std4time = np.std(rgb_frame_stack, axis=3)
-    #
-    #         if file_idx == 0 and group_idx == 0:
-    #             shape = rgb_frame_stack.shape
-    #             rgb_frame_file_group = np.empty((shape[0], shape[1], shape[2], max_n_file, n_group))
-    #             rgb_frame_file_group_var = np.empty((shape[0], shape[1], shape[2], max_n_file, n_group))
-    #
-    #         rgb_frame_file_group[:, :, :, file_idx, group_idx] = rgb_frame_stack_mean4time
-    #         rgb_frame_file_group_var[:, :, :, file_idx, group_idx] = rgb_frame_stack_var4time
-    #
-    # """
-    #     Plot variance distribution for all pixels
-    #
-    # """
-    #
-    # """
-    #     calculate parameters
-    # """
-    # # get tissue name
-    # tissue = [rgb_frame_file_group_info[i]['tissue'][file_idx] for i in range(n_group)]
-    # print('Tissue: {}'.format(tissue))
-    # # find the group of the files for selected led
-    # led = ['Blue', 'Lime']
-    # n_led = len(led)
-    # led_group_idx = mu.find([rgb_frame_file_group_info[i]['led_name'][file_idx] for i in range(n_group)], led)
-    # tmp = []
-    # for i in range(n_group):
-    #     tmp += led_group_idx[i]
-    # led_group_idx = tmp
-    # pled = [rgb_frame_file_group_info[i]['led_power'][file_idx] for i in led_group_idx]
-    #
-    # # calculate a1r, a1g, a1b, a2r, a2g, a2b (see document)
-    # # red channel (index=0) and Blue LED (index=0) will be the numerator
-    # F_de = rgb_frame_file_group[0, :, :, file_idx, led_group_idx[0]]
-    # a = np.empty((n_ch, n_led))
-    # aff = np.empty((n_ch, frame_shape[0], frame_shape[1], n_led))      # full frame
-    # for i in range(n_led):
-    #     for j in range(n_ch):
-    #         F_nu = rgb_frame_file_group[j, :, :, file_idx, led_group_idx[i]]
-    #         tmp = (F_nu/F_de) * (pled[0]/pled[i])
-    #         aff[j, :, :, i] = tmp
-    #         a[j, i] = np.mean(tmp)
-    #
-    # cssp = {'tissue': tissue,
-    #         'led': led,
-    #         'channel': ch,
-    #         'dimension_name': ['channel', 'led'],
-    #         'a': a,
-    #         'aff': aff,
-    #         'rgb_frame_file_group': rgb_frame_file_group,
-    #         'rgb_frame_file_group_var': rgb_frame_file_group_var,
-    #         'info': {'root_dir_group_list': root_dir_group_list,
-    #                  'correct_stray_light': correct_stray_light,
-    #                  'time_range': time_range,
-    #                  'time_range_unit': 'second'}}
-    #
-    # """
-    #     save result
-    # """
-    # save_filename = 'cssp_{}.json'.format(tissue[0])
-    # save_filename_with_path = ('/ariel/data2/Sabrina/data/result/json/{}'.format(save_filename))
-    # with open(save_filename_with_path, 'w') as f:
-    #     json.dump(cssp, f, cls=mu.NumpyEncoder)
-    # f.close()
+    file_index = 0
+    # current only handle the first file in each group. todo: for multiple files
+    for i in range(len(root_dir_group_list)):
+        root_dir_group_list[i] = root_dir_group_list[i][0:2]
+
+    # isx.initialize()
+    ch = ['red', 'green', 'blue']
+    n_group = len(root_dir_group_list)
+    max_n_file = max(len(this_group_root_dir_list) for this_group_root_dir_list in root_dir_group_list) - 1
+    n_ch = len(ch)
+
+    rgb_frame_file_group_info = []
+    cur_short_recording = math.inf
+    """
+        get file info first, if there is any input file info unexpected, we can error ahead of time
+    """
+    for group_idx, this_group_root_dir_list in enumerate(root_dir_group_list):
+        rgb_frame_file_group_info.append({})
+        rgb_frame_file_group_info[group_idx]['tissue'] = []
+        rgb_frame_file_group_info[group_idx]['microscope'] = []
+        rgb_frame_file_group_info[group_idx]['led_name'] = []
+        rgb_frame_file_group_info[group_idx]['led_power'] = []
+        rgb_frame_file_group_info[group_idx]['rgb_file_root_with_path'] = []
+        for file_idx in range(len(this_group_root_dir_list) - 1):
+            root_dir = os.path.join(this_group_root_dir_list[0], this_group_root_dir_list[file_idx + 1])
+            fn = [f for f in listdir(root_dir) if isfile(join(root_dir, f))]
+            print('{} files have been found, they are \n {}'.format(len(fn), fn))
+
+            # find the rgb channel, and sort fn as r/g/b
+            rgb_files, rgb_files_root = isxrgb.find_rgb_channels(fn)
+            print('rgb files are \n {}'.format(rgb_files))
+
+            """
+                get experiment info
+            """
+            exp = isxrgb.get_exp_label(rgb_files_root)
+            rgb_frame_file_group_info[group_idx]['led_power'].append(exp['led_power'])
+            rgb_frame_file_group_info[group_idx]['tissue'].append(exp['tissue'])
+            rgb_frame_file_group_info[group_idx]['microscope'].append(exp['microscope'])
+            rgb_frame_file_group_info[group_idx]['led_name'].append(exp['led_name'])
+            rgb_frame_file_group_info[group_idx]['rgb_file_root_with_path'] = os.path.join(root_dir, rgb_files_root)
+
+            """
+                Open each files and validate conditions before massive reading frames in the next step.
+                This step prepare for the massive file reading and stop the code if input files are not valid.
+            """
+            rgb_files_with_path = [os.path.join(root_dir, file) for file in rgb_files]
+
+            # open one channel first to get the frame numbers
+            ext = os.path.splitext(rgb_files_with_path[0])[1]
+
+            if ext == '.isxd':
+                tmp = isx.Movie(rgb_files_with_path[0])
+                n_frames = tmp.num_frames
+                frame_rate = tmp.frame_rate
+                tmp.close()
+            elif ext == '.tif':
+                tmp = Image.open(rgb_files_with_path[0])
+                n_frames = tmp.n_frames
+                frame_rate = tmp.frame_rate
+                tmp.close()
+
+            frame_range = np.array(time_range) * frame_rate
+            cur_short_recording = min(cur_short_recording, n_frames/frame_rate)
+            if frame_range[1] > n_frames:
+                sys.exit('time_range is too long, there is an input file '
+                         'lasting for {} seconds'.format(n_frames/frame_rate))
+    print('The shortest recording last for {} seconds'.format(cur_short_recording))
+
+    """
+        read image data
+    """
+    for group_idx, this_group_root_dir_list in enumerate(root_dir_group_list):
+        for file_idx in [file_idx]:   #range(len(this_group_root_dir_list) - 1):
+            root_dir = os.path.join(this_group_root_dir_list[0], this_group_root_dir_list[file_idx + 1])
+            fn = [f for f in listdir(root_dir) if isfile(join(root_dir, f))]
+            rgb_files, rgb_files_root = isxrgb.find_rgb_channels(fn)
+
+            rgb_files_with_path = [os.path.join(root_dir, file) for file in rgb_files]
+
+            # open one channel first to get the frame numbers
+            ext = os.path.splitext(rgb_files_with_path[0])[1]
+
+            if ext == '.isxd':
+                tmp = isx.Movie(rgb_files_with_path[0])
+                frame_shape = tmp.shape
+                n_pixels = frame_shape[0] * frame_shape[1]
+                n_frames = tmp.num_frames
+                frame_rate = tmp.frame_rate
+                tmp.close()
+            elif ext == '.tif':
+                tmp = Image.open(rgb_files_with_path[0])
+                frame_shape = tmp.size[::-1]
+                n_pixels = frame_shape[0] * frame_shape[1]
+                n_frames = tmp.n_frames
+                frame_rate = tmp.frame_rate
+                tmp.close()
+
+            # get an example frame to get accurate frame_shape
+            # (especially necessary when correct_bad_pixels == True
+            tmp = isxrgb.get_rgb_frame(rgb_files_with_path, 0, correct_stray_light=correct_stray_light,
+                                       correct_bad_pixels=correct_bad_pixels)
+            frame_shape = tmp.shape[1:3]
+            n_pixels = frame_shape[0] * frame_shape[1]
+
+            frame_range = np.array(time_range) * frame_rate
+            step = math.ceil(frame_range[1]/max_n_frame)
+            select_frame_idx = np.arange(frame_range[0], frame_range[1], step)
+            rgb_frame_stack = np.zeros((len(ch), frame_shape[0], frame_shape[1], len(select_frame_idx)))
+            print('Collect frame', end='')
+            for i, frameIdx in enumerate(select_frame_idx):
+                print('...', end='')
+                this_rgb_frame = isxrgb.get_rgb_frame(rgb_files_with_path, frameIdx,
+                                                      correct_stray_light=correct_stray_light,
+                                                      correct_bad_pixels=correct_bad_pixels)
+                rgb_frame_stack[:, :, :, i] = this_rgb_frame
+                print('frame {}'.format(frameIdx))
+
+            # calculate variance across time for R/G/B
+            rgb_frame_stack_var4time = np.var(rgb_frame_stack, axis=3)
+
+            # calculate average intensity across time for R/G/B
+            rgb_frame_stack_mean4time = np.mean(rgb_frame_stack, axis=3)
+            # rgb_frame_stack_std4time = np.std(rgb_frame_stack, axis=3)
+
+            if file_idx == 0 and group_idx == 0:
+                shape = rgb_frame_stack.shape
+                rgb_frame_file_group = np.empty((shape[0], shape[1], shape[2], max_n_file, n_group))
+                rgb_frame_file_group_var = np.empty((shape[0], shape[1], shape[2], max_n_file, n_group))
+
+            rgb_frame_file_group[:, :, :, file_idx, group_idx] = rgb_frame_stack_mean4time
+            rgb_frame_file_group_var[:, :, :, file_idx, group_idx] = rgb_frame_stack_var4time
+
+    """
+        Plot variance distribution for all pixels
+
+    """
+
+    """
+        calculate parameters
+    """
+    # get tissue name
+    tissue = [rgb_frame_file_group_info[i]['tissue'][file_idx] for i in range(n_group)]
+    print('Tissue: {}'.format(tissue))
+    # find the group of the files for selected led
+    led = ['Blue', 'Lime']
+    n_led = len(led)
+    led_group_idx = mu.find([rgb_frame_file_group_info[i]['led_name'][file_idx] for i in range(n_group)], led)
+    tmp = []
+    for i in range(n_group):
+        tmp += led_group_idx[i]
+    led_group_idx = tmp
+    pled = [rgb_frame_file_group_info[i]['led_power'][file_idx] for i in led_group_idx]
+
+    # calculate a1r, a1g, a1b, a2r, a2g, a2b (see document)
+    # red channel (index=0) and Blue LED (index=0) will be the numerator
+    F_de = rgb_frame_file_group[0, :, :, file_idx, led_group_idx[0]]
+    a = np.empty((n_ch, n_led))
+    aff = np.empty((n_ch, frame_shape[0], frame_shape[1], n_led))      # full frame
+    for i in range(n_led):
+        for j in range(n_ch):
+            F_nu = rgb_frame_file_group[j, :, :, file_idx, led_group_idx[i]]
+            tmp = (F_nu/F_de) * (pled[0]/pled[i])
+            aff[j, :, :, i] = tmp
+            a[j, i] = np.mean(tmp)
+
+    cssp = {'tissue': tissue,
+            'led': led,
+            'channel': ch,
+            'dimension_name': ['channel', 'led'],
+            'a': a,
+            'aff': aff,
+            'rgb_frame_file_group': rgb_frame_file_group,
+            'rgb_frame_file_group_var': rgb_frame_file_group_var,
+            'info': {'root_dir_group_list': root_dir_group_list,
+                     'correct_stray_light': correct_stray_light,
+                     'time_range': time_range,
+                     'time_range_unit': 'second'}}
+
+    """
+        save result
+    """
+    save_filename = 'cssp_{}.json'.format(tissue[0])
+    save_filename_with_path = ('/ariel/data2/Sabrina/data/result/json/update/{}'.format(save_filename))
+    with open(save_filename_with_path, 'w') as f:
+        json.dump(cssp, f, cls=mu.NumpyEncoder)
+    f.close()
 
     """
         load the json file and check the result
