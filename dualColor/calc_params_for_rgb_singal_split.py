@@ -1,5 +1,3 @@
-# from __future__ import division
-
 import isx
 import isxrgb
 import myutilities as mu
@@ -13,7 +11,6 @@ import sys
 
 import math
 import numpy as np
-from PIL import Image
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
@@ -39,6 +36,8 @@ root_dir_group_list = [['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit
 
 
 def main():
+    isx.initialize()
+
     file_index = 0
     # current only handle the first file in each group. todo: for multiple files
     for i in range(len(root_dir_group_list)):
@@ -87,19 +86,8 @@ def main():
             """
             rgb_files_with_path = [os.path.join(root_dir, file) for file in rgb_files]
 
-            # open one channel first to get the frame numbers
-            ext = os.path.splitext(rgb_files_with_path[0])[1]
-
-            if ext == '.isxd':
-                tmp = isx.Movie(rgb_files_with_path[0])
-                n_frames = tmp.num_frames
-                frame_rate = tmp.frame_rate
-                tmp.close()
-            elif ext == '.tif':
-                tmp = Image.open(rgb_files_with_path[0])
-                n_frames = tmp.n_frames
-                frame_rate = tmp.frame_rate
-                tmp.close()
+            frame_shape, n_frames, frame_period, data_type, frame_rate = isxrgb.get_movie_header(rgb_files_with_path,
+                                        correct_bad_pixels=correct_bad_pixels, correct_stray_light=correct_stray_light)
 
             frame_range = np.array(time_range) * frame_rate
             cur_short_recording = min(cur_short_recording, n_frames/frame_rate)
@@ -119,31 +107,10 @@ def main():
 
             rgb_files_with_path = [os.path.join(root_dir, file) for file in rgb_files]
 
-            # open one channel first to get the frame numbers
-            ext = os.path.splitext(rgb_files_with_path[0])[1]
+            frame_shape, num_frames, frame_period, data_type, frame_rate = isxrgb.get_movie_header(rgb_files_with_path,
+                                        correct_bad_pixels=correct_bad_pixels, correct_stray_light=correct_stray_light)
 
-            if ext == '.isxd':
-                tmp = isx.Movie(rgb_files_with_path[0])
-                frame_shape = tmp.shape
-                n_pixels = frame_shape[0] * frame_shape[1]
-                n_frames = tmp.num_frames
-                frame_rate = tmp.frame_rate
-                tmp.close()
-            elif ext == '.tif':
-                tmp = Image.open(rgb_files_with_path[0])
-                frame_shape = tmp.size[::-1]
-                n_pixels = frame_shape[0] * frame_shape[1]
-                n_frames = tmp.n_frames
-                frame_rate = tmp.frame_rate
-                tmp.close()
-
-            # get an example frame to get accurate frame_shape
-            # (especially necessary when correct_bad_pixels == True
-            tmp = isxrgb.get_rgb_frame(rgb_files_with_path, 0, correct_stray_light=correct_stray_light,
-                                       correct_bad_pixels=correct_bad_pixels)
-            frame_shape = tmp.shape[1:3]
             n_pixels = frame_shape[0] * frame_shape[1]
-
             frame_range = np.array(time_range) * frame_rate
             step = math.ceil(frame_range[1]/max_n_frame)
             select_frame_idx = np.arange(frame_range[0], frame_range[1], step)
@@ -162,7 +129,6 @@ def main():
 
             # calculate average intensity across time for R/G/B
             rgb_frame_stack_mean4time = np.mean(rgb_frame_stack, axis=3)
-            # rgb_frame_stack_std4time = np.std(rgb_frame_stack, axis=3)
 
             if file_idx == 0 and group_idx == 0:
                 shape = rgb_frame_stack.shape
@@ -235,6 +201,8 @@ def main():
     view_calc_params_for_rgb_signal_split_result(save_filename_with_path)
 
     plt.show()
+
+    isx.shutdown()
 
 
 def view_calc_params_for_rgb_signal_split_result(cssp_filename_with_path):

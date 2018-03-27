@@ -1,7 +1,7 @@
 # !/usr/local/bin/python
 # isxrgb.py
 import isx
-isx.initialize()
+
 
 def get_rgb_frame(rgb_files, frame_idx, camera_bias=None, correct_stray_light=None, correct_bad_pixels=None):
     import os
@@ -237,7 +237,7 @@ def get_movie_header(rgb_files_with_path, correct_bad_pixels, correct_stray_ligh
                         correct_bad_pixels=correct_bad_pixels)
     frame_shape = tmp.shape[1:3]
 
-    return frame_shape, num_frames, frame_period, data_type
+    return frame_shape, num_frames, frame_period, data_type, frame_rate
 
 
 def get_exp_label(exp_file_root):   #todo: perhaps need to re-structure the create_LOOKUP_exp_label file
@@ -612,6 +612,3 @@ def show_rgb_frame(rgb_frame, ax_list=None, clim=None, cmap=None, colorbar=None,
 
         # cbar.ax.set_yticks(clim)
         # cbar.ax.set_yticklabels(['low', 'medium', 'high'])
-
-
-isx.shutdown()
