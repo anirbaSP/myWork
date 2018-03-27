@@ -1,13 +1,12 @@
 # !/usr/local/bin/python
 # isxrgb.py
 import isx
+isx.initialize()
 
 def get_rgb_frame(rgb_files, frame_idx, camera_bias=None, correct_stray_light=None, correct_bad_pixels=None):
     import os
     from PIL import Image
     import numpy as np
-
-    isx.initialize()
 
     # get movie info for each channel
     if camera_bias is None:
@@ -76,8 +75,6 @@ def get_rgb_frame(rgb_files, frame_idx, camera_bias=None, correct_stray_light=No
 
     if correct_bad_pixels:
         rgb_frame = discard_bad_pixels(rgb_frame)
-
-    isx.shutdown()
 
     return rgb_frame
 
@@ -391,8 +388,6 @@ def get_rgb_pixel_time(rgb_files_with_path, select_frame_idx=None, select_pixel_
     from PIL import Image
     import numpy as np
 
-    isx.initialize()
-
     # Get intensity for specific pixels at specific frames
     ext = os.path.splitext(rgb_files_with_path[0])[1]
     if ext == '.isxd':
@@ -429,8 +424,6 @@ def get_rgb_pixel_time(rgb_files_with_path, select_frame_idx=None, select_pixel_
                                        correct_bad_pixels=correct_bad_pixels)
         rgb_pixel_time[:, :, i] = this_rgb_frame.reshape([-1, n_pixels])[:, select_pixel_idx]
         print('frame {}'.format(frame_idx))
-
-    isx.shutdown()
 
     return rgb_pixel_time
 
@@ -502,25 +495,25 @@ def write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=N
     n_ch = 3
     n_probe = len(exp_probe)
 
-    isx.initialize()
-    # output_mov_list = list
+    output_mov_list = [0]*n_probe
     for i in range(n_probe):
         if exists(save_filename_with_path[i]):
             remove(save_filename_with_path[i])
-    output_mov_list = isx.Movie(save_filename_with_path[0], frame_period=frame_period, shape=shape, num_frames=num_frames, data_type=data_type)
+        output_mov_list[i] = isx.Movie(save_filename_with_path[i], frame_period=frame_period, shape=shape, num_frames=num_frames, data_type=data_type)
+    print('Writing frame...')
     for frame_idx in range(n_frame):
         rgb_frame = get_rgb_frame(rgb_files_with_path, frame_idx, correct_stray_light=correct_stray_light,
                                   correct_bad_pixels=correct_bad_pixels)
         xyz = rgb_signal_split(rgb_frame, aM_inv)
         xyz[xyz < 0] = 0
-        # for i in range(n_probe):
-        output_mov_list.write_frame(xyz[0, :, :], frame_idx)
+        for i in range(n_probe):
+            output_mov_list[i].write_frame(xyz[i, :, :], frame_idx)
         print('...{}'.format(frame_idx))
+    print('... all frames done!')
 
-    # for i in range(exp_probe):
-    output_mov_list.close()
+    for i in range(n_probe):
+        output_mov_list[i].close()
 
-    isx.shutdown()
 
 def calc_aMatrix_for_rgb_signal_split(pled, cssp=None):
     """
@@ -618,3 +611,6 @@ def show_rgb_frame(rgb_frame, ax_list=None, clim=None, cmap=None, colorbar=None,
 
         # cbar.ax.set_yticks(clim)
         # cbar.ax.set_yticklabels(['low', 'medium', 'high'])
+
+
+isx.shutdown()
