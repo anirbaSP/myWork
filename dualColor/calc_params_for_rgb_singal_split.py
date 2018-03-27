@@ -24,15 +24,15 @@ random_pixels = False
 time_range = [0, 300]  # second
 max_n_frame = 20000
 
-root_dir_group_list = [['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-17', '20170717', 'tmp'],
-                       ['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-17', '20170714', 'tmp']
-                       ]
+# root_dir_group_list = [['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-17', '20170717', 'tmp'],
+#                        ['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-17', '20170714', 'tmp']
+#                        ]
 # root_dir_group_list = [['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-55', 'V3_55_20170717'],
 #                        ['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-55', '20170710']
 #                        ]
-# root_dir_group_list = [['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-63/20170807', 'led1'],
-#                        ['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-63/20170807', 'led2']
-#                        ]
+root_dir_group_list = [['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-63/20170807', 'led1'],
+                       ['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-63/20170807', 'led2']
+                       ]
 
 
 def main():
@@ -117,12 +117,13 @@ def main():
             rgb_frame_stack = np.zeros((len(ch), frame_shape[0], frame_shape[1], len(select_frame_idx)))
             print('Collect frame', end='')
             for i, frameIdx in enumerate(select_frame_idx):
-                print('...', end='')
                 this_rgb_frame = isxrgb.get_rgb_frame(rgb_files_with_path, frameIdx,
                                                       correct_stray_light=correct_stray_light,
                                                       correct_bad_pixels=correct_bad_pixels)
                 rgb_frame_stack[:, :, :, i] = this_rgb_frame
-                print('frame {}'.format(frameIdx))
+                if (i+1) / 10 != 0 and (i+1) % 10 == 0:
+                    print('...')
+                    print('\n'.join(map(str, select_frame_idx[(i-9):(i+1)])))
 
             # calculate variance across time for R/G/B
             rgb_frame_stack_var4time = np.var(rgb_frame_stack, axis=3)
