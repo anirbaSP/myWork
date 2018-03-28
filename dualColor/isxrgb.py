@@ -156,6 +156,181 @@ def discard_bad_pixels(rgb):
     return rgb_out
 
 
+class discard_bad_pixels(object):
+    """
+        a dispatch method to handle bad pixels for data collected with NV3-01 color sensor
+    """
+
+    import numpy as np
+
+    def discard_bad_pixels_for_channel(self, channel, im):
+        # Dispatch method
+        method_name = 'discard_bad_pixels_for_' + str(channel) + 'channel'
+        # Get the method from 'self'. Default to a lambda.
+        method = getattr(self, method_name, lambda: "Invalid channel")
+        # Call the method as we return it
+
+        return method()
+
+
+    def discard_bad_pixels_for_red_channel(self, channel, im):
+        x_keep = np.arange(0, n_row, downsampling_x)
+        y_keep = np.arange(1, n_col, downsampling_y)
+        tmp = rgb[0, x_keep, :]
+        tmp = tmp[:, y_keep]
+        tmp[:, 0] = np.nan
+        rgb_out[0, :, :] = np.nanmean(np.stack((tmp[::2, :], tmp[1::2, :]), axis=2), axis=2)
+
+
+    def discard_bad_pixels_for_green_channel(self, channel, im):
+        # greenr
+        x_keep = np.arange(0, n_row, downsampling_x)
+        y_keep = np.arange(0, n_col, downsampling_y)
+        tmp = rgb[1, x_keep, :]
+        tmp = tmp[:, y_keep]
+        tmp1 = np.mean(np.stack((tmp[::2, :], tmp[1::2, :]), axis=2), axis=2)
+        # greenb
+        x_keep = np.arange(1, n_row, downsampling_x)
+        y_keep = np.arange(1, n_col, downsampling_y)
+        tmp = rgb[1, x_keep, :]
+        tmp = tmp[:, y_keep]
+        tmp2 = np.mean(np.stack((tmp[::2, :], tmp[1::2, :]), axis=2), axis=2)
+
+
+    def discard_bad_pixels_for_blue_channel(self, channel, im):
+        x_keep = np.arange(1, n_row, downsampling_x)
+        y_keep = np.arange(0, n_col, downsampling_y)
+        tmp = rgb[2, x_keep, :]
+        tmp = tmp[:, y_keep]
+        rgb_out[2, :, :] = np.mean(np.stack((tmp[::2, :], tmp[1::2, :]), axis=2), axis=2)
+
+
+
+
+
+
+def discard_bad_pixels(frame, channel):
+    """
+       current only for NV3-01 color sensor
+    :param frame:
+    :param channel:
+    :return:
+    """
+
+    import numpy as np
+
+
+    shape = rgb.shape
+    n_ch = shape[0]
+    n_row = shape[1]
+    n_col = shape[2]
+
+    downsampling_x = 2
+    downsampling_y = 4
+    downsampling = max(downsampling_x, downsampling_y)
+    rgb_out = np.empty([n_ch, int(n_row / downsampling), int(n_col / downsampling)])
+    # red channel
+    x_keep = np.arange(0, n_row, downsampling_x)
+    y_keep = np.arange(1, n_col, downsampling_y)
+    tmp = rgb[0, x_keep, :]
+    tmp = tmp[:, y_keep]
+    tmp[:, 0] = np.nan
+    rgb_out[0, :, :] = np.nanmean(np.stack((tmp[::2, :], tmp[1::2, :]), axis=2), axis=2)
+
+    # blue channel
+    x_keep = np.arange(1, n_row, downsampling_x)
+    y_keep = np.arange(0, n_col, downsampling_y)
+    tmp = rgb[2, x_keep, :]
+    tmp = tmp[:, y_keep]
+    rgb_out[2, :, :] = np.mean(np.stack((tmp[::2, :], tmp[1::2, :]), axis=2), axis=2)
+
+    # green channel
+    # greenr
+    x_keep = np.arange(0, n_row, downsampling_x)
+    y_keep = np.arange(0, n_col, downsampling_y)
+    tmp = rgb[1, x_keep, :]
+    tmp = tmp[:, y_keep]
+    tmp1 = np.mean(np.stack((tmp[::2, :], tmp[1::2, :]), axis=2), axis=2)
+    # greenb
+    x_keep = np.arange(1, n_row, downsampling_x)
+    y_keep = np.arange(1, n_col, downsampling_y)
+    tmp = rgb[1, x_keep, :]
+    tmp = tmp[:, y_keep]
+    tmp2 = np.mean(np.stack((tmp[::2, :], tmp[1::2, :]), axis=2), axis=2)
+
+    rgb_out[1, :, :] = np.mean(np.stack((tmp1, tmp2), axis=2), axis=2)
+
+    # first column is nan for red channel, discard it
+    rgb_out = rgb_out[:, :, 1::]
+
+    # data = json.load(open('LOOKUP_bad_pixels.json'))  # todo: add create json file script
+    # idx = exp_label.find(',')
+    # key = exp_label[idx + 2:]
+    # bad_pixels_file_base = data[key]
+    #
+    # ch = ['red', 'green', 'blue']
+    # bad_pixels_files = list()
+    # for i, channel in enumerate(ch):
+    #     bad_pixels_files.append('{}_{}.isxd'.format(bad_pixels_file_base, channel))
+    #
+    # bad_pixels = get_bad_pixels_frame(bad_pixels_files)
+    #
+    # if rgb.ndim == 4:
+    #     rgb_out = np.subtract(np.moveaxis(rgb, 3, 0), bad_pixels)
+    #     rgb_out = np.moveaxis(rgb, 0, -1)
+    # else:
+    #     rgb_out = np.subtract(rgb, bad_pixels)
+
+    return rgb_out
+
+
+def write_corrected_isxd_movie(input_filename_with_path, correct_bad_pixel=None, correct_stray_light=None,
+                               save_pathname=None, save_filename=None):
+    """
+        rewrite the movie to an .isxd file after different options, such as discard bad pixels, correct microscope stray
+        light, etc.
+    :param input_filename_with_path: input .isxd or .tif movie
+    :param correct_bad_pixel:
+    :param correct_stray_light:
+    :param save_pathname:
+    :param save_filename:
+    :return:
+    """
+
+    from os.path import split, splitext, exists, join
+    from os import mkdir
+
+    pathname, filename = split(input_filename_with_path)
+    basename, ext = splitext(filename)
+
+    if save_pathname is None:
+        save_pathname = join(pathname, 'movie_corrected')
+    if ~exists(save_pathname):
+        mkdir(save_pathname)
+
+    if save_filename is None:
+        save_filename = filename
+
+    if correct_bad_pixel is None:
+        correct_bad_pixel = False
+    if correct_stray_light is None:
+        correct_stray_light = False
+
+    mov_in = isx.Movie(input_filename_with_path)
+    flag = True
+    frameIdx = 0
+    while flag:
+        im_in = mov_in.read_frame(frameIdx)
+        if correct_bad_pixel:
+
+
+
+
+
+
+
+
+
 def get_bad_pixels_frame(bad_pixels_files, frame_idx):
     pass    # todo
 
@@ -487,8 +662,9 @@ def write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=N
 
     rgb_files_with_path = find_rgb_files(rgb_filename_with_path)
 
-    shape, num_frames, frame_period, data_type = get_movie_header(rgb_files_with_path,
-                                                                  correct_bad_pixels, correct_stray_light)
+    shape, num_frames, frame_period, data_type, frame_rate= get_movie_header(rgb_files_with_path,
+                                                                  correct_bad_pixels=correct_bad_pixels,
+                                                                  correct_stray_light=correct_stray_light)
     n_row = shape[0]
     n_col = shape[1]
     n_pixel = n_row * n_col
@@ -509,7 +685,10 @@ def write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=N
         xyz[xyz < 0] = 0
         for i in range(n_probe):
             output_mov_list[i].write_frame(xyz[i, :, :], frame_idx)
-        print('...{}'.format(frame_idx))
+        if (frame_idx + 1) / 10 != 0 and (frame_idx + 1) % 10 == 0:
+            print('...')
+            print('\n'.join(map(str, range(frame_idx - 9, frame_idx + 1))))
+
     print('... all frames done!')
 
     for i in range(n_probe):
