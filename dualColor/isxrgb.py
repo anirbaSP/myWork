@@ -4,6 +4,7 @@ import isx
 import numpy as np
 import os
 from PIL import Image
+import myutilities as mu
 
 
 def get_rgb_frame(rgb_files, frame_idx, camera_bias=None, correct_stray_light=None, correct_bad_pixels=None):
@@ -158,12 +159,15 @@ def discard_bad_pixels(rgb):
     return rgb_out
 
 
-class CorrectPixels(object):
+class CorrectBadPixels:
     """
         Tried a dispatch method to handle bad pixels for data collected with NV3-01 color sensor
     """
 
-    def for_channel(self, channel, im):
+    def __int__(self, im, channel):
+        if channel is list:
+            channel = channel[0]
+
         # Dispatch method
         method_name = 'discard_bad_pixels_for_' + str(channel) + 'channel'
         # Get the method from 'self'. Default to a lambda.
@@ -226,8 +230,12 @@ class CorrectPixels(object):
         return im_out
 
 
-def write_corrected_rgb_isxd_movie(input_filename_with_path, correct_bad_pixel=None, correct_stray_light=None,
-                               save_pathname=None, save_filename=None):
+def write_corrected_rgb_isxd_movie(rgb_basename_with_path,
+                                   extension=None,
+                                   correct_bad_pixels=None,
+                                   correct_stray_light=None,
+                                   save_pathname=None,
+                                   save_basename=None):
     """
         rewrite the movie to an .isxd file after different options, such as discard bad pixels, correct microscope stray
         light, etc.
@@ -238,32 +246,67 @@ def write_corrected_rgb_isxd_movie(input_filename_with_path, correct_bad_pixel=N
     :param save_filename:
     :return:
     """
-
-
-    pathname, filename = os.path.split(input_filename_with_path)
-    basename, ext = os.path.splitext(filename)
-
+    if extension is None:
+        extension = '.isxd'
     if save_pathname is None:
-        save_pathname = os.path.join(pathname, 'movie_corrected')
-    if ~os.path.exists(save_pathname):
+        save_pathname = os.path.dirname(rgb_basename_with_path)
+        save_pathname = os.path.join(save_pathname, 'corrected')
+    if not os.path.exists(save_pathname):
         os.mkdir(save_pathname)
 
-    if save_filename is None:
-        save_filename = filename
+    rgb_basename = os.path.basename(rgb_basename_with_path)
+    if save_basename is None:
+        save_basename = rgb_basename
 
-    if correct_bad_pixel is None:
-        correct_bad_pixel = False
+    if correct_bad_pixels is None:
+        correct_bad_pixels = False
     if correct_stray_light is None:
         correct_stray_light = False
 
+    channel = ['red', 'green', 'blue']  # exp['channels']
+    # todo: rewrite get_exp_label() to add channel info. I am having a stronger feeling to write a class for
+    # todo: movie such that each movie is a class with all movie data and header info
 
+    rgb_filenames_with_path = find_rgb_files(rgb_basename_with_path,
+                                             extension=extension,
+                                             channel_list=channel)
 
+    save_filenames_with_path = [os.path.join(save_pathname, '{}_{}.isxd'
+                                             .format(save_basename, thischannel)) for thischannel in channel]
 
+    header = MovieHeader(rgb_filenames_with_path[0])
+    if correct_bad_pixels:
+        header.correct_bad_pixels()
 
+    n_ch = len(channel)
+    n_frame = header.n_frame
 
+    output_mov_list = [0] * n_ch
+    for i in range(n_ch):
+        if os.path.exists(save_filenames_with_path[i]):
+            os.remove(save_filenames_with_path[i])
+        output_mov_list[i] = isx.Movie(save_filenames_with_path[i],
+                                       frame_period=header.frame_period,
+                                       shape=[header.n_row, header.n_col],
+                                       num_frames=header.n_frame,
+                                       data_type=header.data_type)
+    print('Writing frame...')
+    for frame_idx in range(n_frame):
+        rgb_frame = get_rgb_frame(rgb_filenames_with_path, frame_idx,
+                                  correct_stray_light=correct_stray_light,
+                                  correct_bad_pixels=correct_bad_pixels)
+        for i in range(n_ch):
+            output_mov_list[i].write_frame(rgb_frame[i, :, :], frame_idx)
 
+        if (frame_idx + 1) / 10 != 0 and (frame_idx + 1) % 10 == 0:
+            print('...')
+            print('\n'.os.path.join(map(str, range(frame_idx - 9, frame_idx + 1))))
+    print('... all frames done!')
 
+    for i in range(n_ch):
+        output_mov_list[i].close()
 
+    return save_filenames_with_path
 
 
 def get_bad_pixels_frame(bad_pixels_files, frame_idx):
@@ -287,7 +330,7 @@ def find_rgb_channels(fn, channel_list=None):  # find the files for RGB channels
     return rgb_files, rgb_files_root
 
 
-def find_rgb_files(basename_with_path, channel_list=None):
+def find_rgb_files(rgb_basename_with_path, channel_list=None, extension=None):
 
     """
         Use rgb file basename to find files for all channels
@@ -298,19 +341,15 @@ def find_rgb_files(basename_with_path, channel_list=None):
 
     if channel_list is None:
         channel_list = ['red', 'green', 'blue']
-    n_ch = len(channel_list)
+    if extension is None:
+        extension = '.isxd'
 
-    tmp = os.path.split(basename_with_path)
-    pathname = tmp[0]
-    basename = tmp[1]
+    rgb_filenames_with_path = ['{}_{}{}'.format(rgb_basename_with_path, thischannel, extension)
+                               for thischannel in channel_list]
+    if any([not os.path.isfile(thisfile) for thisfile in rgb_filenames_with_path]):
+        return 'At least one file in {} does not exist'.format(rgb_filenames_with_path)
 
-    rgb_files_with_path = [0]*n_ch
-    for i in range(n_ch):
-        rgb_files_with_path[i] = '{}_{}.isxd'.format(basename_with_path, channel_list[i])    #todo:
-        if not os.path.isfile(rgb_files_with_path[i]):
-            return 'rgb file for {} channel does not exist'.format(channel_list[i])
-
-    return rgb_files_with_path
+    return rgb_filenames_with_path
 
 
 def get_movie_header(rgb_files_with_path, correct_bad_pixels, correct_stray_light):  #todo: rewrite to change it as a class
@@ -347,53 +386,84 @@ def get_movie_header(rgb_files_with_path, correct_bad_pixels, correct_stray_ligh
     return frame_shape, num_frames, frame_period, data_type, frame_rate
 
 
-class header(): #rgb_files_with_path, correct_bad_pixels, correct_stray_light):
-    """
-        get the movie "header" info
-    :param rgb_files_with_path:
-    :return:
-    """
+class MovieHeader:
+    """"""
+    def __init__(self, filename_with_path): # correct_bad_pixels, correct_stray_light):
+        self.filename_with_path = filename_with_path
 
-    def method(selfself, attrname):
-    method_name = 'get_frame_shape'
-    def (self, channel, im):
-        # Dispatch method
-        method_name = 'discard_bad_pixels_for_' + str(channel) + 'channel'
-        # G et the method from 'self'. Default to a lambda.
-           m+ethod = getattr(self, method_name, lambda: "Invalid channel")
-        # Call the method
+        # open movie to get the basics
+        tmp = os.path.splitext(filename_with_path)
+        filename = os.path.basename(tmp[0])
+        ext = tmp[1]
+
+        if ext == '.isxd':
+            mov = isx.Movie(filename_with_path)
+            frame_shape = mov.shape
+            n_row = frame_shape[0]
+            n_col = frame_shape[1]
+            n_frame = mov.num_frames
+            frame_rate = mov.frame_rate
+            frame_period = mov.get_frame_period()
+            data_type = mov.data_type
+            mov.close()
+        elif ext == '.tif':
+            mov = Image.open(filename_with_path)
+            frame_shape = mov.size[::-1]
+            n_row = frame_shape[0]
+            n_col = frame_shape[1]
+            n_frame = mov.n_frames
+            frame_rate = 20  # mov.frame_rate #todo: does the tif file always have frame rate info? what's the tag name??
+            frame_period = 10**6/frame_rate
+            data_type = 'numpy.uint16'
+            mov.close()
+
+        self.n_row = n_row
+        self.n_col = n_col
+        self.shape = frame_shape
+        self.n_frame = n_frame
+        self.frame_rate = frame_rate
+        self.frame_period = frame_period
+        self.data_type = data_type
+
+        channel = []
+        for thischannel in ['red', 'green', 'blue']:
+            if thischannel in filename:
+                channel.append(thischannel)
+
+        self.channel = channel
+
+        self.pixel_corrected = False
+        # self.correct_stray_light = False
+
+    def correct_bad_pixels(self):
+        """
+            correct the first frame to get updated n_row, n_col
+        :param correct_bad_pixels:
+        :return:
+        """
+        filename_with_path = self.filename_with_path
+        channel = self.channel
+
+        mov = isx.Movie(filename_with_path)
+        im = mov.read_frame(0)
+        x = CorrectBadPixels()
         downsampling_x = 2
         downsampling_y = 4
-        im_out = method(im, downsampling_x, downsampling_y)
+        method = getattr(x, 'discard_bad_pixels_for_red_channel')
+        im = method(im, downsampling_x, downsampling_y)
 
-        # first column is nan for red channel, discard it
-        return im_out[:, 1::]
+        self.n_row = im.shape[0]
+        self.n_col = im.shape[1]
+        self.shape = [self.n_row, self.n_col]
+        self.correct_bad_pixels = True
 
-    # open one channel first to get the basics of the movie
-    ext = os.path.splitext(rgb_files_with_path[0])[1]
+    def add_exp_info(self):
+        """
+            add experiment information
+        :return:
+        """
+        pass
 
-    if ext == '.isxd':
-        tmp = isx.Movie(rgb_files_with_path[0])
-        # frame_shape = tmp.shape
-        num_frames = tmp.num_frames
-        frame_rate = tmp.frame_rate
-        frame_period = tmp.get_frame_period()
-        data_type = tmp.data_type
-        tmp.close()
-    elif ext == '.tif':
-        tmp = Image.open(rgb_files_with_path[0])
-        # frame_shape = tmp.size[::-1]
-        num_frames = tmp.n_frames
-        frame_rate = 20  # tmp.frame_rate #todo: does the tif file always have frame rate info? what's the tag name??
-        frame_period = 50000
-        tmp.close()
-
-    # get an example frame to get accurate frame_shape (especially necessary when correct_bad_pixels == True
-    tmp = get_rgb_frame(rgb_files_with_path, 0, correct_stray_light=correct_stray_light,
-                        correct_bad_pixels=correct_bad_pixels)
-    frame_shape = tmp.shape[1:3]
-
-    return frame_shape, num_frames, frame_period, data_type, frame_rate
 
 
 def get_exp_label(exp_file_root):   #todo: perhaps need to re-structure the create_LOOKUP_exp_label file

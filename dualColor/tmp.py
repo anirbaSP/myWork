@@ -13,10 +13,15 @@ def main():
 
     isx.initialize()
 
-    run_signal_split()
+    # run_signal_split()
     # run_test_data()
     # run_exp_data()
     # spatial_bandpass_movie()
+
+    # rgb_basename_with_path = '/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3_71/20171127/led12/Movie_2017-11-27-11-56-39'
+    rgb_basename_with_path = '/ariel/data2/Alice/NV3_DualColor/D_Lab/Masa/20170816/led12/Movie_2017-08-16-11-37-29'
+    isxrgb.write_corrected_rgb_isxd_movie(rgb_basename_with_path, extension='_0.tif', correct_bad_pixels=True, correct_stray_light=None,
+                                   save_pathname=None, save_basename=None)
 
     isx.shutdown()
 
