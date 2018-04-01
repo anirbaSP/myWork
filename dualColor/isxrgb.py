@@ -92,7 +92,6 @@ def discard_bad_pixels(rgb):
     :return: rgb_out: array after correct bad pixels, with the shape [n_channel, nn_row, mm_col]
     """
 
-
     import json
 
     shape = rgb.shape
@@ -164,14 +163,16 @@ class CorrectBadPixels:
         Tried a dispatch method to handle bad pixels for data collected with NV3-01 color sensor
     """
 
-    def __int__(self, im, channel):
-        if channel is list:
-            channel = channel[0]
+    def __int__(self):
+        pass
 
+    def correct(self, im, channel):
+        if isinstance(channel, list):
+            channel = channel[0]
         # Dispatch method
-        method_name = 'discard_bad_pixels_for_' + str(channel) + 'channel'
+        method_name = 'discard_bad_pixels_for_' + str(channel) + '_channel'
         # Get the method from 'self'. Default to a lambda.
-        method = getattr(self, method_name, lambda: "Invalid channel")
+        method = getattr(self, method_name)
         # Call the method
         downsampling_x = 2
         downsampling_y = 4
@@ -179,7 +180,6 @@ class CorrectBadPixels:
 
         # first column is nan for red channel, discard it
         return im_out[:, 1::]
-
 
     def discard_bad_pixels_for_red_channel(self, im, downsampling_x, downsampling_y):
         n_row = im.shape[0]
@@ -189,11 +189,10 @@ class CorrectBadPixels:
         y_keep = np.arange(1, n_col, downsampling_y)
         tmp = im[x_keep, :]
         tmp = tmp[:, y_keep]
-        tmp[:, 0] = np.nan # red channel first column is bad
+        tmp[:, 0] = np.nan  # red channel first column is bad
         im_out = np.nanmean(np.stack((tmp[::2, :], tmp[1::2, :]), axis=1), axis=1)
 
         return im_out
-
 
     def discard_bad_pixels_for_green_channel(self, im, downsampling_x, downsampling_y):
         n_row = im.shape[0]
@@ -215,7 +214,6 @@ class CorrectBadPixels:
         im_out = np.mean(np.stack((tmp1, tmp2), axis=1), axis=1)
 
         return im_out
-
 
     def discard_bad_pixels_for_blue_channel(self, im, downsampling_x, downsampling_y):
         n_row = im.shape[0]
@@ -287,7 +285,7 @@ def write_corrected_rgb_isxd_movie(rgb_basename_with_path,
             os.remove(save_filenames_with_path[i])
         output_mov_list[i] = isx.Movie(save_filenames_with_path[i],
                                        frame_period=header.frame_period,
-                                       shape=[header.n_row, header.n_col],
+                                       shape=(header.n_row, header.n_col),
                                        num_frames=header.n_frame,
                                        data_type=header.data_type)
     print('Writing frame...')
@@ -300,7 +298,7 @@ def write_corrected_rgb_isxd_movie(rgb_basename_with_path,
 
         if (frame_idx + 1) / 10 != 0 and (frame_idx + 1) % 10 == 0:
             print('...')
-            print('\n'.os.path.join(map(str, range(frame_idx - 9, frame_idx + 1))))
+            print('\n'.join(map(str, range(frame_idx - 9, frame_idx + 1))))
     print('... all frames done!')
 
     for i in range(n_ch):
@@ -310,7 +308,7 @@ def write_corrected_rgb_isxd_movie(rgb_basename_with_path,
 
 
 def get_bad_pixels_frame(bad_pixels_files, frame_idx):
-    pass    # todo
+    pass  # todo
 
 
 def find_rgb_channels(fn, channel_list=None):  # find the files for RGB channels
@@ -331,7 +329,6 @@ def find_rgb_channels(fn, channel_list=None):  # find the files for RGB channels
 
 
 def find_rgb_files(rgb_basename_with_path, channel_list=None, extension=None):
-
     """
         Use rgb file basename to find files for all channels
     :param basename_with_path:
@@ -352,7 +349,8 @@ def find_rgb_files(rgb_basename_with_path, channel_list=None, extension=None):
     return rgb_filenames_with_path
 
 
-def get_movie_header(rgb_files_with_path, correct_bad_pixels, correct_stray_light):  #todo: rewrite to change it as a class
+def get_movie_header(rgb_files_with_path, correct_bad_pixels,
+                     correct_stray_light):  # todo: rewrite to change it as a class
     """
         get the movie "header" info
     :param rgb_files_with_path:
@@ -388,7 +386,8 @@ def get_movie_header(rgb_files_with_path, correct_bad_pixels, correct_stray_ligh
 
 class MovieHeader:
     """"""
-    def __init__(self, filename_with_path): # correct_bad_pixels, correct_stray_light):
+
+    def __init__(self, filename_with_path):  # correct_bad_pixels, correct_stray_light):
         self.filename_with_path = filename_with_path
 
         # open movie to get the basics
@@ -405,17 +404,16 @@ class MovieHeader:
             frame_rate = mov.frame_rate
             frame_period = mov.get_frame_period()
             data_type = mov.data_type
-            mov.close()
         elif ext == '.tif':
             mov = Image.open(filename_with_path)
             frame_shape = mov.size[::-1]
             n_row = frame_shape[0]
             n_col = frame_shape[1]
-            n_frame = mov.n_frames
+            n_frame = 2000  # mov.n_frames  #it's too slow to get the n_frames tag from a tif file
             frame_rate = 20  # mov.frame_rate #todo: does the tif file always have frame rate info? what's the tag name??
-            frame_period = 10**6/frame_rate
-            data_type = 'numpy.uint16'
-            mov.close()
+            frame_period = int(10 ** 6 / frame_rate)
+            data_type = np.uint16
+        mov.close()
 
         self.n_row = n_row
         self.n_col = n_col
@@ -424,6 +422,7 @@ class MovieHeader:
         self.frame_rate = frame_rate
         self.frame_period = frame_period
         self.data_type = data_type
+        self.extension = ext
 
         channel = []
         for thischannel in ['red', 'green', 'blue']:
@@ -443,14 +442,21 @@ class MovieHeader:
         """
         filename_with_path = self.filename_with_path
         channel = self.channel
+        ext = self.extension
 
-        mov = isx.Movie(filename_with_path)
-        im = mov.read_frame(0)
+        if ext == '.isxd':
+            mov = isx.Movie(filename_with_path)
+            im = mov.read_frame(0)
+        elif ext == '.tif':
+            mov = Image.open(filename_with_path)
+            mov.seek(0)
+            im = np.array(mov)
+        mov.close()
+
         x = CorrectBadPixels()
-        downsampling_x = 2
-        downsampling_y = 4
-        method = getattr(x, 'discard_bad_pixels_for_red_channel')
-        im = method(im, downsampling_x, downsampling_y)
+        # method0 = getattr(x, 'correct')
+        # im = method0(im, channel)
+        im = x.correct(im, channel)
 
         self.n_row = im.shape[0]
         self.n_col = im.shape[1]
@@ -465,8 +471,7 @@ class MovieHeader:
         pass
 
 
-
-def get_exp_label(exp_file_root):   #todo: perhaps need to re-structure the create_LOOKUP_exp_label file
+def get_exp_label(exp_file_root):  # todo: perhaps need to re-structure the create_LOOKUP_exp_label file
 
     import json
 
@@ -511,8 +516,6 @@ def get_exp_label(exp_file_root):   #todo: perhaps need to re-structure the crea
 
 
 def subtract_stray_light(rgb, exp_label, correct_stray_light=None, correct_bad_pixels=None):
-
-
     import json
     import pickle
     import myutilities as mu
@@ -576,10 +579,8 @@ def subtract_stray_light(rgb, exp_label, correct_stray_light=None, correct_bad_p
 
 def get_rgb_pixel_time(rgb_files_with_path, select_frame_idx=None, select_pixel_idx=None, correct_stray_light=None,
                        correct_bad_pixels=None):
-
     import os
     from PIL import Image
-
 
     # Get intensity for specific pixels at specific frames
     ext = os.path.splitext(rgb_files_with_path[0])[1]
@@ -622,9 +623,6 @@ def get_rgb_pixel_time(rgb_files_with_path, select_frame_idx=None, select_pixel_
 
 
 def calc_rgb_ratio(rgb_data, ch=None):
-
-
-
     from itertools import combinations
 
     if ch is None:
@@ -648,7 +646,6 @@ def rgb_signal_split(rgb, aM_inv):
     :return:
     """
 
-
     n_ch = rgb.shape[0]
     n_row = rgb.shape[1]
     n_col = rgb.shape[2]
@@ -664,9 +661,9 @@ def rgb_signal_split(rgb, aM_inv):
     xyz = np.empty([n_probe, n_pixel])
     # for i in range(n_pixel):
     xyz = np.matmul(aM_inv, rgb.reshape([n_ch, n_pixel]))
-        # for j, this_probe in enumerate(probe):
-        #     rgb_s[:, :, :, i][:, i, :] = np.multiply(q[:, j, :], tmp[j])
-        # xyz[:, i] = tmp
+    # for j, this_probe in enumerate(probe):
+    #     rgb_s[:, :, :, i][:, i, :] = np.multiply(q[:, j, :], tmp[j])
+    # xyz[:, i] = tmp
 
     # reshape pixels back to image
     # for j, this_probe in enumerate(probe):
@@ -704,7 +701,8 @@ def write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=N
         save_pathname = os.path.dirname(rgb_filename_with_path)
     if save_filename is None:
         save_filename = rgb_files_basename
-    save_filename_with_path = [os.path.join(save_pathname, '{}_{}.isxd'.format(save_filename, probe)) for probe in exp_probe]
+    save_filename_with_path = [os.path.join(save_pathname, '{}_{}.isxd'.format(save_filename, probe)) for probe in
+                               exp_probe]
     if correct_stray_light is None:
         correct_stray_light = False
     if correct_bad_pixels is None:
@@ -712,9 +710,9 @@ def write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=N
 
     rgb_files_with_path = find_rgb_files(rgb_filename_with_path)
 
-    shape, num_frames, frame_period, data_type, frame_rate= get_movie_header(rgb_files_with_path,
-                                                                  correct_bad_pixels=correct_bad_pixels,
-                                                                  correct_stray_light=correct_stray_light)
+    shape, num_frames, frame_period, data_type, frame_rate = get_movie_header(rgb_files_with_path,
+                                                                              correct_bad_pixels=correct_bad_pixels,
+                                                                              correct_stray_light=correct_stray_light)
     n_row = shape[0]
     n_col = shape[1]
     n_pixel = n_row * n_col
@@ -722,11 +720,12 @@ def write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=N
     n_ch = len(rgb_files_with_path)
     n_probe = len(exp_probe)
 
-    output_mov_list = [0]*n_probe
+    output_mov_list = [0] * n_probe
     for i in range(n_probe):
         if os.path.exists(save_filename_with_path[i]):
             os.remove(save_filename_with_path[i])
-        output_mov_list[i] = isx.Movie(save_filename_with_path[i], frame_period=frame_period, shape=shape, num_frames=num_frames, data_type=data_type)
+        output_mov_list[i] = isx.Movie(save_filename_with_path[i], frame_period=frame_period, shape=shape,
+                                       num_frames=num_frames, data_type=data_type)
     print('Writing frame...')
     for frame_idx in range(n_frame):
         rgb_frame = get_rgb_frame(rgb_files_with_path, frame_idx, correct_stray_light=correct_stray_light,
@@ -737,7 +736,7 @@ def write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=N
             output_mov_list[i].write_frame(xyz[i, :, :], frame_idx)
         if (frame_idx + 1) / 10 != 0 and (frame_idx + 1) % 10 == 0:
             print('...')
-            print('\n'.os.path.join(map(str, range(frame_idx - 9, frame_idx + 1))))
+            print('\n'.join(map(str, range(frame_idx - 9, frame_idx + 1))))
 
     print('... all frames done!')
 
@@ -784,9 +783,7 @@ def calc_aMatrix_for_rgb_signal_split(pled, cssp=None):
 
 
 def show_rgb_frame(rgb_frame, ax_list=None, clim=None, cmap=None, colorbar=None, share_colorbar=None):
-
     import matplotlib.pyplot as plt
-
 
     # show an rgb frame, 3 panels
     ch = ['red', 'green', 'blue']
@@ -817,7 +814,7 @@ def show_rgb_frame(rgb_frame, ax_list=None, clim=None, cmap=None, colorbar=None,
 
     if ax_list is None:
         fig = plt.figure(figsize=(10, 3))
-        gs = plt.GridSpec(1, n_ch+1, width_ratios=[12, 12, 12, 1], wspace=0.1)
+        gs = plt.GridSpec(1, n_ch + 1, width_ratios=[12, 12, 12, 1], wspace=0.1)
         ax_list = list()
         for k in range(n_ch + 1):
             ax_list.append(plt.subplot(gs[0, k]))
@@ -827,7 +824,7 @@ def show_rgb_frame(rgb_frame, ax_list=None, clim=None, cmap=None, colorbar=None,
         im = plt.imshow(rgb_frame[i, :, :], clim=clim[i], cmap=cmapp[i])  # cmap=plt.get_cmap('gray'),
         # ax.set_aspect('equal')
         if cmap is None and colorbar and not share_colorbar:
-            cb = plt.colorbar(im, ticks=clim)  #, location='right', orientation='vertical')
+            cb = plt.colorbar(im, ticks=clim)  # , location='right', orientation='vertical')
             pos = hax.get_position()
             pos0 = cb.ax.get_position()
             cb.ax.set_position([pos0.x0, pos.y0, pos0.width, pos.height])
@@ -837,7 +834,7 @@ def show_rgb_frame(rgb_frame, ax_list=None, clim=None, cmap=None, colorbar=None,
         # plt.autoscale(tight=True)
 
     if colorbar and share_colorbar and len(ax_list) > n_ch:
-        plt.colorbar(cax=ax_list[i+1])
+        plt.colorbar(cax=ax_list[i + 1])
 
         # cbar.ax.set_yticks(clim)
         # cbar.ax.set_yticklabels(['low', 'medium', 'high'])
