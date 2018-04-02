@@ -244,6 +244,9 @@ def write_corrected_rgb_isxd_movie(rgb_basename_with_path,
     :param save_filename:
     :return:
     """
+
+    import pymsgbox
+
     if extension is None:
         extension = '.isxd'
     if save_pathname is None:
@@ -282,10 +285,11 @@ def write_corrected_rgb_isxd_movie(rgb_basename_with_path,
     output_mov_list = [0] * n_ch
     for i in range(n_ch):
         if os.path.exists(save_filenames_with_path[i]):
+            pymsgbox.alert('File exists! do you want to rewrite {}'.format(save_filenames_with_path[i]))
             os.remove(save_filenames_with_path[i])
         output_mov_list[i] = isx.Movie(save_filenames_with_path[i],
                                        frame_period=header.frame_period,
-                                       shape=(header.n_row, header.n_col),
+                                       shape=header.shape,
                                        num_frames=header.n_frame,
                                        data_type=header.data_type)
     print('Writing frame...')
@@ -460,7 +464,7 @@ class MovieHeader:
 
         self.n_row = im.shape[0]
         self.n_col = im.shape[1]
-        self.shape = [self.n_row, self.n_col]
+        self.shape = (self.n_row, self.n_col)
         self.correct_bad_pixels = True
 
     def add_exp_info(self):
@@ -673,8 +677,12 @@ def rgb_signal_split(rgb, aM_inv):
     return xyz
 
 
-def write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=None,
-                     correct_stray_light=None, correct_bad_pixels=None):
+def write_cssp_movie(rgb_basename_with_path,
+                     extension=None,
+                     correct_stray_light=None,
+                     correct_bad_pixels=None,
+                     save_pathname=None,
+                     save_basename=None):
     """
         Write GCaMP and RGeco movie after color signal splitting.
 
@@ -684,7 +692,10 @@ def write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=N
     :return:
     """
 
-    rgb_files_basename = os.path.basename(rgb_filename_with_path)
+    import pymsgbox
+
+    if extension is None:
+        extension = '.isxd'
 
     # todo: rewrite get_exp_label function, make it as a class with method like exp.led, exp.probe
     # exp = get_exp_label(rgb_files_basename)
@@ -693,45 +704,59 @@ def write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename=N
     # exp.probe = ['GCaMP', 'RGeco']
     # aM = calc_aMatrix_for_rgb_signal_split(exp.probe, exp.led, cssp=None)
     exp_led = [1.8, 0.9]
+    exp_channel = ['red', 'green', 'blue']
     exp_probe = ['GCaMP', 'RGeco', 'Autofluo']
     aM = calc_aMatrix_for_rgb_signal_split(exp_led, cssp=None)
     aM_inv = np.linalg.inv(aM)
 
     if save_pathname is None:
-        save_pathname = os.path.dirname(rgb_filename_with_path)
-    if save_filename is None:
-        save_filename = rgb_files_basename
-    save_filename_with_path = [os.path.join(save_pathname, '{}_{}.isxd'.format(save_filename, probe)) for probe in
+        save_pathname = os.path.dirname(rgb_basename_with_path)
+    if not os.path.exists(save_pathname):
+        os.mkdir(save_pathname)
+    rgb_basename = os.path.basename(rgb_basename_with_path)
+    if save_basename is None:
+        save_basename = rgb_basename
+    save_filenames_with_path = [os.path.join(save_pathname, '{}_{}.isxd'.format(save_basename, probe)) for probe in
                                exp_probe]
     if correct_stray_light is None:
         correct_stray_light = False
     if correct_bad_pixels is None:
         correct_bad_pixels = False
 
-    rgb_files_with_path = find_rgb_files(rgb_filename_with_path)
+    rgb_filenames_with_path = find_rgb_files(rgb_basename_with_path,
+                                             extension=extension,
+                                             channel_list=exp_channel)
 
-    shape, num_frames, frame_period, data_type, frame_rate = get_movie_header(rgb_files_with_path,
-                                                                              correct_bad_pixels=correct_bad_pixels,
-                                                                              correct_stray_light=correct_stray_light)
-    n_row = shape[0]
-    n_col = shape[1]
-    n_pixel = n_row * n_col
-    n_frame = num_frames
-    n_ch = len(rgb_files_with_path)
+    header = MovieHeader(rgb_filenames_with_path[0])
+    if correct_bad_pixels:
+        header.correct_bad_pixels()
+
+    n_ch = len(exp_channel)
+    n_frame = header.n_frame
     n_probe = len(exp_probe)
 
     output_mov_list = [0] * n_probe
     for i in range(n_probe):
-        if os.path.exists(save_filename_with_path[i]):
-            os.remove(save_filename_with_path[i])
-        output_mov_list[i] = isx.Movie(save_filename_with_path[i], frame_period=frame_period, shape=shape,
-                                       num_frames=num_frames, data_type=data_type)
+        if os.path.exists(save_filenames_with_path[i]):
+            os.remove(save_filenames_with_path[i])
+            pymsgbox.alert('File exists! do you want to rewrite {}'.format(save_filenames_with_path[i]))
+        output_mov_list[i] = isx.Movie(save_filenames_with_path[i],
+                                       frame_period=header.frame_period,
+                                       shape=header.shape,
+                                       num_frames=header.n_frame,
+                                       data_type=header.data_type)
     print('Writing frame...')
     for frame_idx in range(n_frame):
-        rgb_frame = get_rgb_frame(rgb_files_with_path, frame_idx, correct_stray_light=correct_stray_light,
+        rgb_frame = get_rgb_frame(rgb_filenames_with_path, frame_idx,
+                                  correct_stray_light=correct_stray_light,
                                   correct_bad_pixels=correct_bad_pixels)
         xyz = rgb_signal_split(rgb_frame, aM_inv)
-        xyz[xyz < 0] = 0
+
+        # xyz_min = xyz.reshape((n_probe, header.n_row * header.n_col)).min(axis=1)
+        # xyz = np.subtract(xyz, xyz_min[:, np.newaxis, np.newaxis])
+        # xyz[xyz < 0] = 0
+        xyz += 30000
+
         for i in range(n_probe):
             output_mov_list[i].write_frame(xyz[i, :, :], frame_idx)
         if (frame_idx + 1) / 10 != 0 and (frame_idx + 1) % 10 == 0:

@@ -13,25 +13,28 @@ def main():
 
     isx.initialize()
 
-    # run_signal_split()
+    run_signal_split()
     # run_test_data()
     # run_exp_data()
     # spatial_bandpass_movie()
 
     # rgb_basename_with_path = '/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3_71/20171127/led12/Movie_2017-11-27-11-56-39'
-    rgb_basename_with_path = '/ariel/data2/Alice/NV3_DualColor/D_Lab/Masa/20170816/led12/Movie_2017-08-16-11-37-29'
-    isxrgb.write_corrected_rgb_isxd_movie(rgb_basename_with_path, extension='_0.tif', correct_bad_pixels=True, correct_stray_light=None,
-                                   save_pathname=None, save_basename=None)
+    # rgb_basename_with_path = '/ariel/data2/Alice/NV3_DualColor/D_Lab/Masa/20170816/led12/Movie_2017-08-16-11-37-29'
+    # isxrgb.write_corrected_rgb_isxd_movie(rgb_basename_with_path, extension='.isxd',
+    #                                       correct_bad_pixels=True, correct_stray_light=None,
+    #                                       save_pathname=None, save_basename=None)
 
     isx.shutdown()
 
-def run_signal_split():
-    root_dir = '/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3_71/20171127/led12' # D_Lab/Masa/20170816/led12'
-    rgb_file_basename = 'Movie_2017-11-27-11-56-39'
-    rgb_filename_with_path = join(root_dir, rgb_file_basename)
 
-    isxrgb.write_cssp_movie(rgb_filename_with_path, save_pathname=None, save_filename='test',
-                     correct_stray_light=None, correct_bad_pixels=True)
+def run_signal_split():
+    root_dir = '/ariel/data2/Alice/NV3_DualColor/D_Lab/Masa/20170816/led12' #NV3_color_sensor_12bit/V3_71/20171127/led12'   #
+    rgb_file_basename = 'Movie_2017-08-16-11-37-29'   #'Movie_2017-11-27-11-56-39' #'
+    rgb_basename_with_path = join(root_dir, rgb_file_basename)
+
+    isxrgb.write_cssp_movie(rgb_basename_with_path, extension='_0.tif',
+                            correct_bad_pixels=True, correct_stray_light=None,
+                            save_pathname=None, save_basename=None)
 
 
     # show the result
