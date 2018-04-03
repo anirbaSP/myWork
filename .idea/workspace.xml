@@ -2,12 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f5a96286-306c-4f34-a5e3-fab399f05c78" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change beforePath="$PROJECT_DIR$/.idea/myWork.iml" afterPath="$PROJECT_DIR$/.idea/myWork.iml" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/dualColor/calc_params_for_rgb_singal_split.py" afterPath="$PROJECT_DIR$/dualColor/calc_params_for_rgb_singal_split.py" />
       <change beforePath="$PROJECT_DIR$/dualColor/downsamplingFile4DualColorData.py" afterPath="$PROJECT_DIR$/dualColor/downsamplingFile4DualColorData.py" />
       <change beforePath="$PROJECT_DIR$/dualColor/isxrgb.py" afterPath="$PROJECT_DIR$/dualColor/isxrgb.py" />
-      <change beforePath="$PROJECT_DIR$/dualColor/tmp.py" afterPath="$PROJECT_DIR$/dualColor/tmp.py" />
+      <change beforePath="$PROJECT_DIR$/dualColor/result/figure/cssp_GCaMP.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/dualColor/result/isxd/xyz.isxd" afterPath="$PROJECT_DIR$/dualColor/result/isxd/xyz.isxd" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -20,35 +20,17 @@
     <favorites_list name="myWork" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.8378623">
+    <splitter split-orientation="horizontal" split-proportion="0.8309481">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="isxrgb.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/dualColor/isxrgb.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="360">
-                  <caret line="24" column="36" lean-forward="false" selection-start-line="24" selection-start-column="27" selection-end-line="24" selection-end-column="36" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="tmp.py" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/dualColor/tmp.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="357">
-                  <caret line="171" column="26" lean-forward="true" selection-start-line="171" selection-start-column="26" selection-end-line="171" selection-end-column="26" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="LOOKUP_exp_label.txt" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/dualColor/LOOKUP_exp_label.txt">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="0">
-                  <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-                  <folding />
+                <state relative-caret-position="300">
+                  <caret line="23" column="64" lean-forward="false" selection-start-line="23" selection-start-column="64" selection-end-line="23" selection-end-column="64" />
+                  <folding>
+                    <element signature="e#37#47#0" expanded="true" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -56,8 +38,30 @@
           <file leaf-file-name="core.py" pinned="false" current-in-tab="false">
             <entry file="file:///Applications/Inscopix Data Processing.app/Contents/API/Python/isx/core.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="464">
-                  <caret line="42" column="27" lean-forward="true" selection-start-line="42" selection-start-column="27" selection-end-line="42" selection-end-column="27" />
+                <state relative-caret-position="1530">
+                  <caret line="109" column="0" lean-forward="false" selection-start-line="109" selection-start-column="0" selection-end-line="109" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="calc_params_for_rgb_singal_split.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/dualColor/calc_params_for_rgb_singal_split.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="4755">
+                  <caret line="330" column="33" lean-forward="false" selection-start-line="330" selection-start-column="33" selection-end-line="330" selection-end-column="33" />
+                  <folding>
+                    <element signature="e#0#10#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="tmp.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/dualColor/tmp.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="210">
+                  <caret line="23" column="0" lean-forward="false" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -66,18 +70,18 @@
           <file leaf-file-name="K_Lab.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/dualColor/K_Lab.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="855">
-                  <caret line="68" column="14" lean-forward="false" selection-start-line="68" selection-start-column="14" selection-end-line="68" selection-end-column="14" />
+                <state relative-caret-position="390">
+                  <caret line="37" column="0" lean-forward="false" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="stats_accross_files.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="stats_accross_files.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/dualColor/stats_accross_files.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="322">
-                  <caret line="95" column="0" lean-forward="false" selection-start-line="95" selection-start-column="0" selection-end-line="95" selection-end-column="0" />
+                <state relative-caret-position="115">
+                  <caret line="46" column="81" lean-forward="true" selection-start-line="46" selection-start-column="81" selection-end-line="46" selection-end-column="81" />
                   <folding>
                     <element signature="e#0#10#0" expanded="true" />
                   </folding>
@@ -88,20 +92,8 @@
           <file leaf-file-name="rgb_signal_split.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/dualColor/rgb_signal_split.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-84">
-                  <caret line="39" column="35" lean-forward="false" selection-start-line="39" selection-start-column="35" selection-end-line="39" selection-end-column="35" />
-                  <folding>
-                    <element signature="e#0#9#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="create_stray_ligth_stardard_curve.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/dualColor/create_stray_ligth_stardard_curve.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="622">
-                  <caret line="105" column="84" lean-forward="false" selection-start-line="105" selection-start-column="84" selection-end-line="105" selection-end-column="84" />
+                <state relative-caret-position="585">
+                  <caret line="55" column="23" lean-forward="false" selection-start-line="55" selection-start-column="18" selection-end-line="55" selection-end-column="23" />
                   <folding>
                     <element signature="e#0#10#0" expanded="true" />
                   </folding>
@@ -109,13 +101,13 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="calc_params_for_rgb_singal_split.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/dualColor/calc_params_for_rgb_singal_split.py">
+          <file leaf-file-name="static_dynamic.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/dualColor/static_dynamic.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="431">
-                  <caret line="247" column="79" lean-forward="false" selection-start-line="247" selection-start-column="4" selection-end-line="247" selection-end-column="79" />
+                <state relative-caret-position="675">
+                  <caret line="52" column="59" lean-forward="false" selection-start-line="52" selection-start-column="59" selection-end-line="52" selection-end-column="59" />
                   <folding>
-                    <element signature="e#0#31#0" expanded="true" />
+                    <element signature="e#0#10#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -125,10 +117,10 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="create_LOOKUP_stray_light_correction.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="create_LOOKUP_stray_light_correction.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/dualColor/create_LOOKUP_stray_light_correction.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="406">
+                <state relative-caret-position="420">
                   <caret line="30" column="80" lean-forward="false" selection-start-line="30" selection-start-column="80" selection-end-line="30" selection-end-column="80" />
                   <folding>
                     <element signature="e#0#11#0" expanded="true" />
@@ -171,11 +163,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="myplotmodules.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="myplotmodules.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/dualColor/myplotmodules.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="240">
-                  <caret line="16" column="0" lean-forward="false" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
+                <state relative-caret-position="540">
+                  <caret line="36" column="3" lean-forward="false" selection-start-line="36" selection-start-column="3" selection-end-line="36" selection-end-column="3" />
                   <folding />
                 </state>
               </provider>
@@ -188,51 +180,45 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="SQL Script" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>set_xlim</find>
-      <find>datetime</find>
-      <find>text</find>
-      <find>off</find>
-      <find>equal</find>
-      <find>a_ff</find>
-      <find>tick</find>
-      <find>tight</find>
-      <find>col_num</find>
-      <find>ext</find>
-      <find>tif</find>
-      <find>axis</find>
-      <find>count</find>
-      <find>xlabel</find>
-      <find>title</find>
-      <find>base</find>
-      <find>save</find>
-      <find>stray_light_file_base</find>
-      <find>chan_num</find>
-      <find>correct_bad_green_pixels</find>
-      <find>correct</find>
-      <find>correct_bad_pixels</find>
-      <find>microscope</find>
-      <find>micro</find>
       <find>import os</find>
       <find>rgb_frame</find>
       <find>unique</find>
-      <find>exp_label</find>
       <find>isx</find>
       <find>isx.Movie</find>
+      <find>exp_label</find>
+      <find>os.path.expanduser</find>
+      <find>rgb_frame_stack_mean4time</find>
+      <find>rgb_frame_file_group</find>
+      <find>isx.shu</find>
+      <find>isx.ini</find>
+      <find>header</find>
+      <find>random</find>
+      <find>n_select</find>
+      <find>discard</find>
+      <find>import numpy as np</find>
+      <find>from os.path</find>
+      <find>isfile</find>
+      <find>dirname</find>
+      <find>basename</find>
+      <find>mkdir</find>
+      <find>remove</find>
+      <find>exists</find>
+      <find>splitext</find>
+      <find>split</find>
+      <find>get_rgb_frame</find>
+      <find>write</find>
+      <find>'\n'.os.path.joi</find>
+      <find>join</find>
+      <find>class</find>
     </findStrings>
     <replaceStrings>
-      <replace>Stray,</replace>
-      <replace>rgb_frame_file_group</replace>
-      <replace>rgb_frame_file_group_info[group_idx]</replace>
-      <replace>drop</replace>
-      <replace>n_pixels</replace>
-      <replace>isxrgb.get_exp_label</replace>
       <replace>isxrgb.find_rgb_channels</replace>
       <replace>isxrgb.subtract_stray_light</replace>
       <replace>isxrgb.get_rgb_frame_from_tiff</replace>
@@ -254,6 +240,15 @@
       <replace>correct_bad_pixels</replace>
       <replace>correct_stray_light</replace>
       <replace>rgb</replace>
+      <replace>os.path.isfile</replace>
+      <replace>os.path.dirname</replace>
+      <replace>os.path.basename</replace>
+      <replace>os.mkdir</replace>
+      <replace>os.path.join</replace>
+      <replace>os.remove</replace>
+      <replace>os.path.exists</replace>
+      <replace>os.path.splitext</replace>
+      <replace>os.path.split</replace>
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/dualColor</dir>
@@ -286,20 +281,20 @@
         <option value="$PROJECT_DIR$/../DB6400/phase2/team034_p2_schema.sql" />
         <option value="$PROJECT_DIR$/dualColor/stats_accross_files.py" />
         <option value="$PROJECT_DIR$/dualColor/myutilities.py" />
-        <option value="$PROJECT_DIR$/dualColor/myplotmodules.py" />
         <option value="$PROJECT_DIR$/dualColor/create_LOOKUP_exp_label.py" />
         <option value="$PROJECT_DIR$/dualColor/rgb_signal_split.py" />
+        <option value="$PROJECT_DIR$/dualColor/myplotmodules.py" />
+        <option value="$PROJECT_DIR$/dualColor/static_dynamic.py" />
+        <option value="$PROJECT_DIR$/dualColor/tmp.py" />
         <option value="$PROJECT_DIR$/dualColor/calc_params_for_rgb_singal_split.py" />
         <option value="$PROJECT_DIR$/dualColor/isxrgb.py" />
-        <option value="$PROJECT_DIR$/dualColor/tmp.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="650" />
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="23" />
-    <option name="width" value="1270" />
-    <option name="height" value="1050" />
+    <option name="width" value="1280" />
+    <option name="height" value="777" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -335,22 +330,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="myWork" type="b2602c69:ProjectViewProjectNode" />
-              <item name="myWork" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="myWork" type="b2602c69:ProjectViewProjectNode" />
-              <item name="myWork" type="462c0819:PsiDirectoryNode" />
-              <item name="dualColor" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
       <pane id="Scope">
         <subPane subId="Project Files">
           <expand>
@@ -367,12 +346,28 @@
           <select />
         </subPane>
       </pane>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="myWork" type="b2602c69:ProjectViewProjectNode" />
+              <item name="myWork" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="myWork" type="b2602c69:ProjectViewProjectNode" />
+              <item name="myWork" type="462c0819:PsiDirectoryNode" />
+              <item name="dualColor" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
       <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyIntegratedToolsModulesConfigurable" />
+    <property name="settings.editor.selected.configurable" value="PyConsoleConfigurable.Python Console" />
     <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file:///home/psxu/Applications/Inscopix Data Processing 1.0.0/Inscopix Data Processing.linux/Contents/API/Python/isx.py" />
   </component>
   <component name="PyConsoleOptionsProvider">
@@ -407,24 +402,6 @@
     </option>
   </component>
   <component name="RunManager" selected="Python.tmp">
-    <configuration name="K_Lab" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/dualColor" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="myWork" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/dualColor/K_Lab.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-    </configuration>
     <configuration name="calc_params_for_rgb_singal_split" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -479,6 +456,24 @@
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
     </configuration>
+    <configuration name="static_dynamic" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/dualColor" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="myWork" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/dualColor/static_dynamic.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
     <configuration name="stats_accross_files" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -518,19 +513,19 @@
     <list size="7">
       <item index="0" class="java.lang.String" itemvalue="Python.rgb_signal_split" />
       <item index="1" class="java.lang.String" itemvalue="Python.isxrgb" />
-      <item index="2" class="java.lang.String" itemvalue="Python.K_Lab" />
-      <item index="3" class="java.lang.String" itemvalue="Python.create_LOOKUP_exp_label" />
-      <item index="4" class="java.lang.String" itemvalue="Python.stats_accross_files" />
-      <item index="5" class="java.lang.String" itemvalue="Python.calc_params_for_rgb_singal_split" />
-      <item index="6" class="java.lang.String" itemvalue="Python.tmp" />
+      <item index="2" class="java.lang.String" itemvalue="Python.create_LOOKUP_exp_label" />
+      <item index="3" class="java.lang.String" itemvalue="Python.stats_accross_files" />
+      <item index="4" class="java.lang.String" itemvalue="Python.calc_params_for_rgb_singal_split" />
+      <item index="5" class="java.lang.String" itemvalue="Python.tmp" />
+      <item index="6" class="java.lang.String" itemvalue="Python.static_dynamic" />
     </list>
     <recent_temporary>
       <list size="5">
         <item index="0" class="java.lang.String" itemvalue="Python.tmp" />
         <item index="1" class="java.lang.String" itemvalue="Python.calc_params_for_rgb_singal_split" />
-        <item index="2" class="java.lang.String" itemvalue="Python.create_LOOKUP_exp_label" />
-        <item index="3" class="java.lang.String" itemvalue="Python.stats_accross_files" />
-        <item index="4" class="java.lang.String" itemvalue="Python.K_Lab" />
+        <item index="2" class="java.lang.String" itemvalue="Python.static_dynamic" />
+        <item index="3" class="java.lang.String" itemvalue="Python.create_LOOKUP_exp_label" />
+        <item index="4" class="java.lang.String" itemvalue="Python.stats_accross_files" />
       </list>
     </recent_temporary>
   </component>
@@ -560,27 +555,27 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="650" y="23" width="1270" height="1050" extended-state="0" />
+    <frame x="0" y="23" width="1280" height="777" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.49783817" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28196982" sideWeight="0.46375266" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24920128" sideWeight="0.49783817" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="DB Browser" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33414435" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="DB Execution Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27427962" sideWeight="0.40675366" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23497854" sideWeight="0.59324634" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27414772" sideWeight="0.59324634" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="true" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.32934782" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="true" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.32542372" sideWeight="0.85787123" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.32608697" sideWeight="0.4969325" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13530825" sideWeight="0.46375266" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32870865" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="true" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.3258786" sideWeight="0.85787123" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2494043" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="true" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.3390558" sideWeight="0.67672753" order="3" side_tool="false" content_ui="tabs" x="245" y="448" width="1625" height="481" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.32611173" sideWeight="0.4969325" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="true" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.3025568" sideWeight="0.67672753" order="3" side_tool="false" content_ui="tabs" x="245" y="448" width="1625" height="481" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20113544" sideWeight="0.5362473" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32870865" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -591,24 +586,24 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dualColor/tmp.py</url>
-          <line>89</line>
-          <option name="timeStamp" value="722" />
+          <url>file://$PROJECT_DIR$/dualColor/isxrgb.py</url>
+          <line>295</line>
+          <option name="timeStamp" value="800" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dualColor/tmp.py</url>
-          <line>129</line>
-          <option name="timeStamp" value="730" />
+          <url>file:///Applications/Inscopix Data Processing.app/Contents/API/Python/isx/core.py</url>
+          <line>109</line>
+          <option name="timeStamp" value="802" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dualColor/tmp.py</url>
-          <line>155</line>
-          <option name="timeStamp" value="731" />
+          <url>file://$PROJECT_DIR$/dualColor/isxrgb.py</url>
+          <line>183</line>
+          <option name="timeStamp" value="803" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dualColor/tmp.py</url>
-          <line>69</line>
-          <option name="timeStamp" value="732" />
+          <url>file://$PROJECT_DIR$/dualColor/isxrgb.py</url>
+          <line>454</line>
+          <option name="timeStamp" value="804" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -621,7 +616,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="733" />
+      <option name="time" value="805" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -647,13 +642,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$USER_HOME$/Documents/course/python/Python3EssentialTraining/Exercise Files/17 Modules/modules-working.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Documents/course/python/Python3EssentialTraining/Exercise Files/12 Classes/decorators.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -782,7 +770,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="178">
           <caret line="1071" column="0" lean-forward="false" selection-start-line="1071" selection-start-column="0" selection-end-line="1071" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -797,17 +784,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
           <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dualColor/mymodels.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="19" column="0" lean-forward="false" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -825,25 +801,40 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dualColor/myplotmodules.py">
+    <entry file="file:///Applications/Inscopix Data Processing.app/Contents/API/Python/isx.py" />
+    <entry file="file:///Applications/anaconda3/lib/python3.6/site-packages/sklearn/decomposition/fastica_.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="0" lean-forward="false" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
+        <state relative-caret-position="150">
+          <caret line="10" column="0" lean-forward="false" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dualColor/LOOKUP_exp_label.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dualColor/create_stray_ligth_stardard_curve.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-261">
+          <caret line="105" column="84" lean-forward="false" selection-start-line="105" selection-start-column="84" selection-end-line="105" selection-end-column="84" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dualColor/K_Lab.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="37" column="0" lean-forward="false" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file:///Applications/anaconda3/lib/python3.6/codecs.py">
+    <entry file="file://$PROJECT_DIR$/dualColor/create_LOOKUP_stray_light_correction.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="311" column="0" lean-forward="true" selection-start-line="311" selection-start-column="0" selection-end-line="311" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dualColor/myutilities.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="7" column="40" lean-forward="false" selection-start-line="7" selection-start-column="40" selection-end-line="7" selection-end-column="40" />
+        <state relative-caret-position="420">
+          <caret line="30" column="80" lean-forward="false" selection-start-line="30" selection-start-column="80" selection-end-line="30" selection-end-column="80" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
@@ -858,46 +849,40 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dualColor/create_LOOKUP_stray_light_correction.py">
+    <entry file="file://$PROJECT_DIR$/dualColor/myutilities.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="406">
-          <caret line="30" column="80" lean-forward="false" selection-start-line="30" selection-start-column="80" selection-end-line="30" selection-end-column="80" />
+        <state relative-caret-position="90">
+          <caret line="7" column="40" lean-forward="false" selection-start-line="7" selection-start-column="40" selection-end-line="7" selection-end-column="40" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file:///Applications/Inscopix Data Processing.app/Contents/API/Python/isx.py" />
-    <entry file="file:///Applications/anaconda3/lib/python3.6/site-packages/sklearn/decomposition/fastica_.py">
+    <entry file="file://$PROJECT_DIR$/dualColor/mymodels.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="0" lean-forward="false" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+        <state relative-caret-position="255">
+          <caret line="19" column="0" lean-forward="false" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dualColor/K_Lab.py">
+    <entry file="file://$PROJECT_DIR$/dualColor/static_dynamic.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="855">
-          <caret line="68" column="14" lean-forward="false" selection-start-line="68" selection-start-column="14" selection-end-line="68" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dualColor/stats_accross_files.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="95" column="0" lean-forward="false" selection-start-line="95" selection-start-column="0" selection-end-line="95" selection-end-column="0" />
+        <state relative-caret-position="675">
+          <caret line="52" column="59" lean-forward="false" selection-start-line="52" selection-start-column="59" selection-end-line="52" selection-end-column="59" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dualColor/create_stray_ligth_stardard_curve.py">
+    <entry file="file://$PROJECT_DIR$/dualColor/calc_params_for_rgb_singal_split.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="622">
-          <caret line="105" column="84" lean-forward="false" selection-start-line="105" selection-start-column="84" selection-end-line="105" selection-end-column="84" />
+        <state relative-caret-position="4755">
+          <caret line="330" column="33" lean-forward="false" selection-start-line="330" selection-start-column="33" selection-end-line="330" selection-end-column="33" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>
@@ -906,53 +891,62 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/dualColor/rgb_signal_split.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-84">
-          <caret line="39" column="35" lean-forward="false" selection-start-line="39" selection-start-column="35" selection-end-line="39" selection-end-column="35" />
+        <state relative-caret-position="585">
+          <caret line="55" column="23" lean-forward="false" selection-start-line="55" selection-start-column="18" selection-end-line="55" selection-end-column="23" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dualColor/calc_params_for_rgb_singal_split.py">
+    <entry file="file:///Applications/anaconda3/lib/python3.6/codecs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="431">
-          <caret line="247" column="79" lean-forward="false" selection-start-line="247" selection-start-column="4" selection-end-line="247" selection-end-column="79" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="269">
+          <caret line="310" column="0" lean-forward="false" selection-start-line="310" selection-start-column="0" selection-end-line="310" selection-end-column="0" />
         </state>
       </provider>
     </entry>
     <entry file="file:///Applications/Inscopix Data Processing.app/Contents/API/Python/isx/core.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="464">
-          <caret line="42" column="27" lean-forward="true" selection-start-line="42" selection-start-column="27" selection-end-line="42" selection-end-column="27" />
+        <state relative-caret-position="1530">
+          <caret line="109" column="0" lean-forward="false" selection-start-line="109" selection-start-column="0" selection-end-line="109" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dualColor/myplotmodules.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="540">
+          <caret line="36" column="3" lean-forward="false" selection-start-line="36" selection-start-column="3" selection-end-line="36" selection-end-column="3" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/dualColor/isxrgb.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="24" column="36" lean-forward="false" selection-start-line="24" selection-start-column="27" selection-end-line="24" selection-end-column="36" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dualColor/LOOKUP_exp_label.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+        <state relative-caret-position="300">
+          <caret line="23" column="64" lean-forward="false" selection-start-line="23" selection-start-column="64" selection-end-line="23" selection-end-column="64" />
+          <folding>
+            <element signature="e#37#47#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/dualColor/tmp.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="171" column="26" lean-forward="true" selection-start-line="171" selection-start-column="26" selection-end-line="171" selection-end-column="26" />
+        <state relative-caret-position="210">
+          <caret line="23" column="0" lean-forward="false" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dualColor/stats_accross_files.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="115">
+          <caret line="46" column="81" lean-forward="true" selection-start-line="46" selection-start-column="81" selection-end-line="46" selection-end-column="81" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

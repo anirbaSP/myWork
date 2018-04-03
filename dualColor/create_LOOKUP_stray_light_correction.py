@@ -10,7 +10,21 @@ data = {
     'NV3-04, Lime (2,18mW) LED': 'NV3-04/led2_0_gain3_coverOff/Movie_2018-02-21-14-29-17',  # 1.6  gain3, coverOff
     'NV3-04, Lime (0,85mW) LED': 'NV3-04/led2_3_gain1_coverOff/Movie_2018-02-21-14-32-07',  # 0.6  gain1, coverOff
     'NV3-04, Lime (0,56mW) LED': 'NV3-04/led2_4_gain1_coverOff/Movie_2018-02-21-14-31-52',  # 0.4  gain1, coverOff
-
+    'NV3-01, Blue (0,4mW) LED': 'NV3-01/20180314/Movie_2018-03-14-11-13-18',  # 0.4  gain1, coverOff
+    'NV3-01, Blue (0,6mW) LED': 'NV3-01/20180314/Movie_2018-03-14-11-13-34',  # 0.4  gain1, coverOff
+    'NV3-01, Blue (0,8mW) LED': 'NV3-01/20180314/Movie_2018-03-14-11-13-50',  # 0.4  gain1, coverOff
+    'NV3-01, Blue (1,0mW) LED': 'NV3-01/20180314/Movie_2018-03-14-11-14-11',  # 0.4  gain1, coverOff
+    'NV3-01, Blue (1,6mW) LED': 'NV3-01/20180314/Movie_2018-03-14-11-14-33',  # 0.4  gain1, coverOff
+    'NV3-01, Blue (1,8mW) LED': 'NV3-01/20180314/Movie_2018-03-14-11-14-50',  # 0.4  gain1, coverOff
+    'NV3-01, Blue (2,0mW) LED': 'NV3-01/20180314/Movie_2018-03-14-11-15-08',  # 0.4  gain1, coverOff
+    'NV3-01, Lime (0,2mW) LED': 'NV3-01/20180314/Movie_2018-03-14-11-17-44',  # 0.4  gain1, coverOff
+    'NV3-01, Lime (0,4mW) LED': 'NV3-01/20180314/Movie_2018-03-14-11-17-56',  # 0.4  gain1, coverOff
+    'NV3-01, Lime (0,6mW) LED': 'NV3-01/20180314/Movie_2018-03-14-11-18-14',  # 0.4  gain1, coverOff
+    'NV3-01, Lime (0,8mW) LED': 'NV3-01/20180314/Movie_2018-03-14-11-18-31',  # 0.4  gain1, coverOff
+    'NV3-01, Lime (1,2mW) LED': 'NV3-01/20180314/Movie_2018-03-14-11-18-50',  # 0.4  gain1, coverOff
+    'NV3-01, Lime (1,4mW) LED': 'NV3-01/20180314/Movie_2018-03-14-11-19-05',  # 0.4  gain1, coverOff
+    'NV3-01, Lime (1,6mW) LED': 'NV3-01/20180314/Movie_2018-03-14-11-19-19',  # 0.4  gain1, coverOff
+}
     # 'NV3-01, Blue (2mW) LED': 'NV3-01/led1_0/Movie_2018-01-26-09-47-45',
     # 'NV3-01, Blue (1,5mW) LED': 'NV3-01/led1_1/Movie_2018-01-26-09-48-42',
     # 'NV3-01, Blue (1mW) LED': 'NV3-01/led1_2/Movie_2018-01-26-09-49-31',
@@ -37,9 +51,8 @@ data = {
     # 'NV3-04, Blue (2mW) + Lime (1,6mW) LED': 'NV3-04/led12_0/Movie_2018-01-26-10-18-32',
     # 'NV3-04, Blue (1,5mW) + Lime (1,2mW) LED': 'NV3-04/led12_1/Movie_2018-01-26-10-19-34',
     # 'NV3-04, Blue (1mW) + Lime (0,8mW) LED': 'NV3-04/led12_2/Movie_2018-01-26-10-20-30',
-}
 
-shared_path = '/Volumes/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/Scope_Autofluorescence'
+shared_path = '/Volumes/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/Scope_Autofluorescence/'
 for key in data:
     data[key] = os.path.join(shared_path, data[key])
 
