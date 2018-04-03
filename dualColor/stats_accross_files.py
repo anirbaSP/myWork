@@ -47,44 +47,22 @@ def main():
             print('{} files have been found, they are \n {}'.format(len(fn), fn))
 
             # find the rgb channel, and sort fn as r/g/b
-            rgb_files, rgb_files_root = isxrgb.find_rgb_channels(fn)
-            print('rgb files are \n {}'.format(rgb_files))
+            rgb_filenames, rgb_basename = isxrgb.find_rgb_channels(fn)
+            print('rgb files are \n {}'.format(rgb_filenames))
 
-            exp_label = isxrgb.get_exp_label(rgb_files_root)
+            exp_label = isxrgb.get_exp_label(rgb_basename)
 
-            rgb_files_with_path = [os.path.join(root_dir, file) for file in rgb_files]
+            rgb_filenames_with_path = [os.path.join(root_dir, file) for file in rgb_filenames]
 
-            # open one channel first to get the frame numbers
-            ext = os.path.splitext(rgb_files_with_path[0])[1]
+            header = isxrgb.MovieHeader(rgb_filenames_with_path[0])
 
-            if ext == '.isxd':
-                tmp = isx.Movie(rgb_files_with_path[0])
-                frame_shape = tmp.shape
-                n_pixels = frame_shape[0] * frame_shape[1]
-                n_frames = tmp.num_frames
-                frame_rate = tmp.frame_rate
-                tmp.close()
-            elif ext == '.tif':
-                tmp = Image.open(rgb_files_with_path[0])
-                frame_shape = tmp.size[::-1]
-                n_pixels = frame_shape[0] * frame_shape[1]
-                n_frames = tmp.n_frames
-                frame_rate = tmp.frame_rate
-                tmp.close()
-
-            # get an example frame to get accurate frame_shape (especially necessary when correct_bad_green_pixels == True
-            tmp = isxrgb.get_rgb_frame(rgb_files_with_path, 0, correct_stray_light=correct_stray_light,
-                                       correct_bad_green_pixels=correct_bad_green_pixels)
-            frame_shape = tmp.shape[1:3]
-            n_pixels = frame_shape[0] * frame_shape[1]
-
-            frame_range = np.array(time_range) * frame_rate
+            frame_range = np.array(time_range) * header.frame_rate
             select_frame_idx = np.arange(frame_range[0], frame_range[1])
-            rgb_frame_stack = np.zeros((len(ch), frame_shape[0], frame_shape[1], len(select_frame_idx)))
+            rgb_frame_stack = np.zeros((len(ch), header.n_row, header.n_col, len(select_frame_idx)))
             print('Collect frame', end='')
             for i, frameIdx in enumerate(select_frame_idx):  # show randomly selected frames
                 print('...', end='')
-                this_rgb_frame = isxrgb.get_rgb_frame(rgb_files_with_path, frameIdx,
+                this_rgb_frame = isxrgb.get_rgb_frame(rgb_filenames_with_path, frameIdx,
                                                       correct_stray_light=correct_stray_light,
                                                       correct_bad_green_pixels=correct_bad_green_pixels)
                 rgb_frame_stack[:, :, :, i] = this_rgb_frame
@@ -101,21 +79,13 @@ def main():
             rgb_frame_file_group[:, :, :, file_idx, group_idx] = rgb_frame_stack_mean4time
 
             # get experimental parameter from exp_label
-            idx1 = exp_label.rfind('(')
-            idx2 = exp_label.rfind(')')
-            rgb_frame_file_group_info[group_idx]['led_power'].append(float(exp_label[idx1+1:idx2-2].replace(',', '.', 1)))
-            idx3 = exp_label[0:idx1].rfind(',')
-            idx_tmp1 = exp_label[0:idx3].rfind('(')
-            idx_tmp2 = exp_label[0:idx3].rfind(')')
-            if idx_tmp1 != -1 or idx_tmp2 != -1:
-                idx3 = exp_label[0:idx3].rfind(',')
-            idx4 = exp_label[0:idx3].rfind(',')
 
-            rgb_frame_file_group_info[group_idx]['tissue'].append(exp_label[0:idx4])
-            rgb_frame_file_group_info[group_idx]['microscope'].append(exp_label[idx4+2:idx3])
-            rgb_frame_file_group_info[group_idx]['led_name'].append(exp_label[idx3+2:idx1-1])
+            rgb_frame_file_group_info[group_idx]['tissue'].append(exp_label['tissue'])
+            rgb_frame_file_group_info[group_idx]['microscope'].append(exp_label['microscope'])
+            rgb_frame_file_group_info[group_idx]['led_name'].append(exp_label['led_name'])
 
     # select pixels to plot
+    n_pixels = header.n_row * header.n_col
     if random_pixels:
         select_pixels = random.sample(range(n_pixels), n_select_pixels)
     else:
@@ -127,7 +97,12 @@ def main():
         n_group2plot = n_group+1
     else:
         n_group2plot = n_group
-    gs = plt.GridSpec(3, n_group2plot, left=0.05, right=0.95, wspace=0.3, width_ratios=[4, 4, 4, 3])
+    gs = plt.GridSpec(3,
+                      n_group2plot,
+                      left=0.05,
+                      right=0.95,
+                      wspace=0.3,
+                      width_ratios=[4, 4, 4, 3])
     ax_list = []
     for j in range(n_group2plot):
         tmp = []
@@ -137,12 +112,16 @@ def main():
     # tmp = [ax_list[i:i + n_ch] for i in range(0, len(ax_list) - 1, n_ch)]
     # ax_list = tmp
 
-    # plot_rgb_intensity_vs_ledPower(rgb_frame_file_group, rgb_frame_file_group_info, select_pixels,
-    #                                ax_list=ax_list[:-1])
+    plot_rgb_intensity_vs_ledPower(rgb_frame_file_group,
+                                   rgb_frame_file_group_info,
+                                   select_pixels,
+                                   ax_list=ax_list[:-1])
 
     for group_idx in range(n_group):
-        isxrgb.show_rgb_frame(rgb_frame_file_group[:, :, :, 0, group_idx], ax_list=ax_list[group_idx],
-                              clim=[0, 2000], cmap=None, colorbar=False)
+        isxrgb.show_rgb_frame(rgb_frame_file_group[:, :, :, 0, group_idx],
+                              ax_list=ax_list[group_idx],
+                              clim=[0, 2000],
+                              cmap=None, colorbar=False)
         label = '{} ({}mW) LED'.format(rgb_frame_file_group_info[group_idx]['led_name'][0],
                                             rgb_frame_file_group_info[group_idx]['led_power'][0])
         if group_idx == 2:
