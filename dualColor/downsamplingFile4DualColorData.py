@@ -1,17 +1,27 @@
 import isx
-import numpy as np
-
-import matplotlib
-matplotlib.use('TkAgg')
-
-import matplotlib.pyplot as plt
 import os
+from os import listdir
+from os.path import isfile, join
 
+import numpy as np
 # always initialize the API before use
 isx.initialize()
 
-root_dir = '/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-17/20170717'
-recording_file = os.path.join(root_dir, 'Movie_2017-07-17-10-39-25_blue.isxd') # do same for blue and red chanel
+root_dir = '/Volumes/Data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-55/V3_55_20170717'
+# '/Volumes/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3_39/20170807'
+# '/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-17/20170717'
+# '/Users/Sabrina/workspace/data/pipeline_s'
+
+fn = [f for f in listdir(root_dir) if isfile(join(root_dir, f))]
+print('{} files have been found, they are \n {}'.format(len(fn), fn))
+
+channel = ['red', 'green', 'blue']
+
+recording_file = fn[2]
+recording_file = os.path.join(root_dir, recording_file)
+# 'Movie_2017-07-17-16-20-59_blue.isx')
+# 'Movie_2017-08-07-14-01-28_blue')
+# 'Movie_2017-07-17-10-39-25_blue.isxd') # do same for blue and red chanel
 
 # for later use, grab the name of the recording file, and strip off the file extension
 root_dir, recording_file_name_with_ext = os.path.split(recording_file)
@@ -42,6 +52,6 @@ print(pp_file)
 
 crop_rect = [10, 10, raw_movie.shape[0] - 10, raw_movie.shape[1] - 1] # crop by 10 pixels
 raw_movie.close()
-isx.preprocess(recording_file, pp_file, temporal_downsample_factor= 5, spatial_downsample_factor= 6,
+isx.preprocess(recording_file, pp_file, temporal_downsample_factor=5, spatial_downsample_factor=6,
                crop_rect=crop_rect, fix_defective_pixels=True)
 

@@ -17,26 +17,53 @@ import matplotlib.pyplot as plt
 
 import json
 
-correct_stray_light = False
-correct_bad_pixels = True
-n_select_pixels = 1000
-random_pixels = False
-time_range = [0, 300]  # second
-max_n_frame = 20000
-
-# root_dir_group_list = [['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-17', '20170717', 'tmp'],
-#                        ['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-17', '20170714', 'tmp']
-#                        ]
-# root_dir_group_list = [['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-55', 'V3_55_20170717'],
-#                        ['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-55', '20170710']
-#                        ]
-root_dir_group_list = [['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-63/20170807', 'led1'],
-                       ['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-63/20170807', 'led2']
-                       ]
-
 
 def main():
+
     isx.initialize()
+
+    correct_stray_light = False
+    correct_bad_pixels = True
+    time_range = [0, 300]  # second
+    max_n_frame = 20000
+
+    # root_dir_group_list = [['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-17', '20170717', 'tmp'],
+    #                        ['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-17', '20170714', 'tmp']
+    #                        ]
+    # root_dir_group_list = [['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-55', 'V3_55_20170717'],
+    #                        ['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-55', '20170710']
+    #                        ]
+    root_dir_group_list = [['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-63/20170807', 'led1'],
+                           ['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3-63/20170807', 'led2']
+                           ]
+
+    save_pathname = '/ariel/data2/Sabrina/data/result/json/tmp'
+    save_filename_with_path = calc_params_for_rgb_signal_split(root_dir_group_list, time_range, max_n_frame,
+                                                               correct_stray_light=correct_stray_light,
+                                                               correct_bad_pixels=correct_bad_pixels,
+                                                               save_pathname=save_pathname,
+                                                               save_filename=None)
+
+    """
+        load the json file and check the result
+    """
+    # save_filename = 'cssp_GCaMP.json'
+    # save_filename_with_path = '/ariel/data2/Sabrina/data/result/json/update{}'.format(filename)
+    view_calc_params_for_rgb_signal_split_result(save_filename_with_path)
+
+    plt.show()
+
+    isx.shutdown()
+
+
+def calc_params_for_rgb_signal_split(root_dir_group_list, time_range, max_n_frame,
+                                     correct_stray_light=None, correct_bad_pixels=None,
+                                     save_pathname=None, save_filename=None):
+
+    if correct_bad_pixels is None:
+        correct_bad_pixels = False
+    if correct_stray_light is None:
+        correct_stray_light = False
 
     file_index = 0
     # current only handle the first file in each group. todo: for multiple files
@@ -87,20 +114,20 @@ def main():
             rgb_files_with_path = [os.path.join(root_dir, file) for file in rgb_files]
 
             frame_shape, n_frames, frame_period, data_type, frame_rate = isxrgb.get_movie_header(rgb_files_with_path,
-                                        correct_bad_pixels=correct_bad_pixels, correct_stray_light=correct_stray_light)
+                                         correct_bad_pixels=correct_bad_pixels, correct_stray_light=correct_stray_light)
 
             frame_range = np.array(time_range) * frame_rate
-            cur_short_recording = min(cur_short_recording, n_frames/frame_rate)
+            cur_short_recording = min(cur_short_recording, n_frames / frame_rate)
             if frame_range[1] > n_frames:
                 sys.exit('time_range is too long, there is an input file '
-                         'lasting for {} seconds'.format(n_frames/frame_rate))
+                         'lasting for {} seconds'.format(n_frames / frame_rate))
     print('The shortest recording last for {} seconds'.format(cur_short_recording))
 
     """
         read image data
     """
     for group_idx, this_group_root_dir_list in enumerate(root_dir_group_list):
-        for file_idx in [file_idx]:   #range(len(this_group_root_dir_list) - 1):
+        for file_idx in [file_idx]:  # range(len(this_group_root_dir_list) - 1):
             root_dir = os.path.join(this_group_root_dir_list[0], this_group_root_dir_list[file_idx + 1])
             fn = [f for f in listdir(root_dir) if isfile(join(root_dir, f))]
             rgb_files, rgb_files_root = isxrgb.find_rgb_channels(fn)
@@ -108,22 +135,21 @@ def main():
             rgb_files_with_path = [os.path.join(root_dir, file) for file in rgb_files]
 
             frame_shape, num_frames, frame_period, data_type, frame_rate = isxrgb.get_movie_header(rgb_files_with_path,
-                                        correct_bad_pixels=correct_bad_pixels, correct_stray_light=correct_stray_light)
+                                         correct_bad_pixels=correct_bad_pixels, correct_stray_light=correct_stray_light)
 
             n_pixels = frame_shape[0] * frame_shape[1]
             frame_range = np.array(time_range) * frame_rate
-            step = math.ceil(frame_range[1]/max_n_frame)
+            step = math.ceil(frame_range[1] / max_n_frame)
             select_frame_idx = np.arange(frame_range[0], frame_range[1], step)
             rgb_frame_stack = np.zeros((len(ch), frame_shape[0], frame_shape[1], len(select_frame_idx)))
             print('Collect frame', end='')
             for i, frameIdx in enumerate(select_frame_idx):
                 this_rgb_frame = isxrgb.get_rgb_frame(rgb_files_with_path, frameIdx,
-                                                      correct_stray_light=correct_stray_light,
-                                                      correct_bad_pixels=correct_bad_pixels)
+                                        correct_stray_light=correct_stray_light, correct_bad_pixels=correct_bad_pixels)
                 rgb_frame_stack[:, :, :, i] = this_rgb_frame
-                if (i+1) / 10 != 0 and (i+1) % 10 == 0:
+                if (i + 1) / 10 != 0 and (i + 1) % 10 == 0:
                     print('...')
-                    print('\n'.join(map(str, select_frame_idx[(i-9):(i+1)])))
+                    print('\n'.join(map(str, select_frame_idx[(i - 9):(i + 1)])))
 
             # calculate variance across time for R/G/B
             rgb_frame_stack_var4time = np.var(rgb_frame_stack, axis=3)
@@ -139,10 +165,6 @@ def main():
             rgb_frame_file_group[:, :, :, file_idx, group_idx] = rgb_frame_stack_mean4time
             rgb_frame_file_group_var[:, :, :, file_idx, group_idx] = rgb_frame_stack_var4time
 
-    """
-        Plot variance distribution for all pixels
-
-    """
 
     """
         calculate parameters
@@ -164,11 +186,11 @@ def main():
     # red channel (index=0) and Blue LED (index=0) will be the numerator
     F_de = rgb_frame_file_group[0, :, :, file_idx, led_group_idx[0]]
     a = np.empty((n_ch, n_led))
-    aff = np.empty((n_ch, frame_shape[0], frame_shape[1], n_led))      # full frame
+    aff = np.empty((n_ch, frame_shape[0], frame_shape[1], n_led))  # full frame
     for i in range(n_led):
         for j in range(n_ch):
             F_nu = rgb_frame_file_group[j, :, :, file_idx, led_group_idx[i]]
-            tmp = (F_nu/F_de) * (pled[0]/pled[i])
+            tmp = (F_nu / F_de) * (pled[0] / pled[i])
             aff[j, :, :, i] = tmp
             a[j, i] = np.mean(tmp)
 
@@ -188,22 +210,17 @@ def main():
     """
         save result
     """
-    save_filename = 'cssp_{}.json'.format(tissue[0])
-    save_filename_with_path = ('/ariel/data2/Sabrina/data/result/json/update/{}'.format(save_filename))
+    if save_pathname is None:
+        save_pathname = '/ariel/data2/Sabrina/data/result/json'
+    if save_filename is None:
+        save_filename = 'cssp_{}.json'.format(tissue[0])
+
+    save_filename_with_path = join(save_pathname, save_filename)
     with open(save_filename_with_path, 'w') as f:
         json.dump(cssp, f, cls=mu.NumpyEncoder)
     f.close()
 
-    """
-        load the json file and check the result
-    """
-    filename = 'cssp_GCaMP.json'  #save_filename    #'cssp_RGeco_300s.json'    #
-    save_filename_with_path = '/ariel/data2/Sabrina/data/result/json/{}'.format(filename)
-    view_calc_params_for_rgb_signal_split_result(save_filename_with_path)
-
-    plt.show()
-
-    isx.shutdown()
+    return save_filename_with_path
 
 
 def view_calc_params_for_rgb_signal_split_result(cssp_filename_with_path):

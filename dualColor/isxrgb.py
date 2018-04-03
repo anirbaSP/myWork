@@ -4,7 +4,6 @@ import isx
 import numpy as np
 import os
 from PIL import Image
-import myutilities as mu
 
 
 def get_rgb_frame(rgb_files, frame_idx, camera_bias=None, correct_stray_light=None, correct_bad_pixels=None):
