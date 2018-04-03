@@ -1,9 +1,13 @@
 import json
 
 data = {
-    'Movie_2018-01-26-09-47-45': 'Stray, NV3-01, Blue (2mW) LED',
-    'Movie_2018-01-26-09-48-42': 'Stray, NV3-01, Blue (1,5mW) LED',
-    'Movie_2018-01-26-09-49-31': 'Stray, NV3-01, Blue (1mW) LED',
+    'Movie_2018-03-14-11-15-08': 'Stray, NV3-01, Blue (2mW) LED',
+    'Movie_2018-03-14-11-14-50': 'Stray, NV3-01, Blue (1,8mW) LED',
+    'Movie_2018-03-14-11-14-33': 'Stray, NV3-01, Blue (1,6mW) LED',
+    'Movie_2018-03-14-11-14-11': 'Stray, NV3-01, Blue (1,0mW) LED',
+    'Movie_2018-03-14-11-13-50': 'Stray, NV3-01, Blue (0,8mW) LED',
+    'Movie_2018-03-14-11-13-34': 'Stray, NV3-01, Blue (0,6mW) LED',
+    'Movie_2018-03-14-11-13-18': 'Stray, NV3-01, Blue (0,4mW) LED',
     'Movie_2018-01-26-09-50-31': 'Stray, NV3-01, Lime (2,02mW) LED', #1,6
     'Movie_2018-01-26-09-51-20': 'Stray, NV3-01, Lime (1,54mW) LED', #1.2
     'Movie_2018-01-26-09-52-14': 'Stray, NV3-01, Lime (1,04mW) LED', #0,8

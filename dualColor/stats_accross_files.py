@@ -15,19 +15,24 @@ from itertools import combinations
 import random
 
 correct_stray_light = False
-correct_bad_green_pixels = True
+correct_bad_pixels = True
 n_select_pixels = 1000
 random_pixels = False
 time_range = [0, 0.03]  # second
 
-root_dir_group_list = [['/Volumes/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3_71/20171127', 'led1'],
-                       ['/Volumes/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3_71/20171127', 'led2'],
-                       ['/Volumes/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3_71/20171127', 'led12']
-                       ]
-check_additivity = True
+root_dir_group_list = [['/ariel/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/Scope_Autofluorescence/NV3-01',
+                        'led1_6', 'led1_5', 'led1_4', 'led1_3', 'led1_2', 'led1_1', 'led1_0']]
+
+# ['/Volumes/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3_71/20171127', 'led2'],
+# ['/Volumes/data2/Alice/NV3_DualColor/NV3_color_sensor_12bit/V3_71/20171127', 'led12']
+# ]
+check_additivity = False
+
 
 def main():
-    # isx.initialize()
+
+    isx.initialize()
+
     ch = ['red', 'green', 'blue']
     n_group = len(root_dir_group_list)
     max_n_file = max(len(this_group_root_dir_list) for this_group_root_dir_list in root_dir_group_list) - 1
@@ -55,6 +60,8 @@ def main():
             rgb_filenames_with_path = [os.path.join(root_dir, file) for file in rgb_filenames]
 
             header = isxrgb.MovieHeader(rgb_filenames_with_path[0])
+            if correct_bad_pixels:
+                header.correct_bad_pixels()
 
             frame_range = np.array(time_range) * header.frame_rate
             select_frame_idx = np.arange(frame_range[0], frame_range[1])
@@ -64,7 +71,7 @@ def main():
                 print('...', end='')
                 this_rgb_frame = isxrgb.get_rgb_frame(rgb_filenames_with_path, frameIdx,
                                                       correct_stray_light=correct_stray_light,
-                                                      correct_bad_green_pixels=correct_bad_green_pixels)
+                                                      correct_bad_pixels=correct_bad_pixels)
                 rgb_frame_stack[:, :, :, i] = this_rgb_frame
                 print('frame {}'.format(frameIdx))
 
@@ -162,6 +169,8 @@ def main():
                 orientation='portrait', papertype=None, format=None,
                 transparent=False, bbox_inches=None, pad_inches=0.1,
                 frameon=None)
+
+    isx.shutdown()
 
 
 def plot_rgb_intensity_vs_ledPower(rgb_frame_file_group, rgb_frame_file_group_info, select_pixels,
