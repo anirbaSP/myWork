@@ -6,6 +6,177 @@ import os
 from PIL import Image
 
 
+class rgbMovie:
+
+    def __init__(self,
+                 rgb_basename_with_path,
+                 channel=None,
+                 ext=None,
+                 discard_bad_pixels=None,
+                 subtract_stray_light):
+
+
+        if channel is None:
+            channel = ['red', 'green', 'blue']
+
+        if ext is None:
+            ext = '.isxd'
+
+        tmp = os.path.split(rgb_basename_with_path)
+        self.basename = tmp[1]
+        self.path = tmp[0]
+        self.ext = ext
+        self.channel = channel
+
+        get_rgb_filenames(self)
+        self.ext = os.path.splitext(ext)[1] # update the ext in case '_0.tif' is used
+        get_header(self)
+
+        if discard_bad_pixels is None:
+            discard_bad_pixels = False
+
+        if discard_bad_pixels:
+            discard_bad_pixels_4rgbMovie(self)
+
+
+
+
+    def discard_bad_pixels_4rgbMovie(self):
+
+    def get_rgb_filenames(self):
+        """
+            Use rgb file basename to find files for all channels
+        """
+        path = self.path
+        basename = self.basename
+        channel = self.channel
+        ext = self.ext
+
+        rgb_filenames_with_path = ['{}_{}{}'.format(os.path.join(path, basename), thischannel, ext)
+                                   for thischannel in channel]
+        if any([not os.path.isfile(thisfile) for thisfile in rgb_filenames_with_path]):
+            return 'At least one file in {} does not exist'.format(rgb_filenames_with_path)
+
+        self.rgb_filenames_with_path = rgb_filenames_with_path
+
+    def get_header(self):
+        """
+            open movie for each file, and get movie header
+        :return:
+        """
+        ext = self.ext
+        rgb_filenames_with_path = self.rgb_filenames_with_path
+
+        n_mov = len(rgb_filenames_with_path)
+        mov_list = [0]*n_mov
+        for i, thisfile in enumerate(rgb_filenames_with_path):
+
+            if ext == '.isxd':
+                mov = isx.Movie(thisfile)
+                frame_shape = mov.shape
+                n_row = frame_shape[0]
+                n_col = frame_shape[1]
+                n_frame = mov.num_frames
+                frame_rate = mov.frame_rate
+                frame_period = mov.get_frame_period()
+                data_type = mov.data_type
+            elif ext == '.tif':
+                mov = Image.open(thisfile)
+                frame_shape = mov.size[::-1]
+                n_row = frame_shape[0]
+                n_col = frame_shape[1]
+                n_frame = 2000  # mov.n_frames  #it's too slow to get the n_frames tag from a tif file
+                frame_rate = 20  # mov.frame_rate #todo: does the tif file always have frame rate info? what's the tag name??
+                frame_period = int(10 ** 6 / frame_rate)
+                data_type = np.uint16
+            mov_list[i] = mov
+
+            self.mov = mov_list
+            self.n_row = n_row
+            self.n_col = n_col
+            self.shape = frame_shape
+            self.n_frame = n_frame
+            self.frame_rate = frame_rate
+            self.frame_period = frame_period
+            self.data_type = data_type
+
+            self.pixel_corrected = False
+            self.correct_stray_light = False
+
+
+
+class DiscardBadPixels:
+    """
+        Tried a dispatch method to handle bad pixels for data collected with NV3-01 color sensor
+    """
+
+    def discard4channel(self, im, channel):
+        if isinstance(channel, list):
+            channel = channel[0]
+        # Dispatch method
+        method_name = 'discard_bad_pixels_for_' + str(channel) + '_channel'
+        # Get the method from 'self'. Default to a lambda.
+        method = getattr(self, method_name, lambda: "Invalid rgb channel name")
+        # Call the method
+        im_out = method(im)
+
+        # first column is nan for red channel, discard it
+
+        return im_out
+
+    def discard_bad_pixels_for_red_channel(self, im):
+        downsampling_x = 2
+        downsampling_y = 4
+        n_row = im.shape[0]
+        n_col = im.shape[1]
+
+        x_keep = np.arange(0, n_row, downsampling_x)
+        y_keep = np.arange(1, n_col, downsampling_y)
+        tmp = im[x_keep, :]
+        tmp = tmp[:, y_keep]
+        tmp[:, 0] = np.nan  # red channel first column is bad
+        im_out = np.nanmean(np.stack((tmp[::2, :], tmp[1::2, :]), axis=1), axis=1)
+
+        return im_out[:, 1::]
+
+    def discard_bad_pixels_for_green_channel(self, im):
+        downsampling_x = 2
+        downsampling_y = 4
+        n_row = im.shape[0]
+        n_col = im.shape[1]
+
+        # greenr
+        x_keep = np.arange(0, n_row, downsampling_x)
+        y_keep = np.arange(0, n_col, downsampling_y)
+        tmp = im[x_keep, :]
+        tmp = tmp[:, y_keep]
+        tmp1 = np.mean(np.stack((tmp[::2, :], tmp[1::2, :]), axis=1), axis=1)
+        # greenb
+        x_keep = np.arange(1, n_row, downsampling_x)
+        y_keep = np.arange(1, n_col, downsampling_y)
+        tmp = im[x_keep, :]
+        tmp = tmp[:, y_keep]
+        tmp2 = np.mean(np.stack((tmp[::2, :], tmp[1::2, :]), axis=1), axis=1)
+
+        im_out = np.mean(np.stack((tmp1, tmp2), axis=1), axis=1)
+
+        return im_out[:, 1::]
+
+    def discard_bad_pixels_for_blue_channel(self, im):
+        downsampling_x = 2
+        downsampling_y = 4
+        n_row = im.shape[0]
+        n_col = im.shape[1]
+
+        x_keep = np.arange(1, n_row, downsampling_x)
+        y_keep = np.arange(0, n_col, downsampling_y)
+        tmp = im[x_keep, :]
+        tmp = tmp[:, y_keep]
+        im_out = np.mean(np.stack((tmp[::2, :], tmp[1::2, :]), axis=1), axis=1)
+
+        return im_out[:, 1::]
+
+
 def get_rgb_frame(rgb_files, frame_idx, camera_bias=None, correct_stray_light=None, correct_bad_pixels=None):
     import os
     from PIL import Image
@@ -76,6 +247,8 @@ def get_rgb_frame(rgb_files, frame_idx, camera_bias=None, correct_stray_light=No
         rgb_frame = subtract_stray_light(rgb_frame, exp_label)
 
     if correct_bad_pixels:
+        x = DiscardBadPixels()
+        x.discard4channel(rgb_frame)
         rgb_frame = discard_bad_pixels(rgb_frame)
 
     return rgb_frame
@@ -157,74 +330,6 @@ def discard_bad_pixels(rgb):
     return rgb_out
 
 
-class CorrectBadPixels:
-    """
-        Tried a dispatch method to handle bad pixels for data collected with NV3-01 color sensor
-    """
-
-    def __int__(self):
-        pass
-
-    def correct(self, im, channel):
-        if isinstance(channel, list):
-            channel = channel[0]
-        # Dispatch method
-        method_name = 'discard_bad_pixels_for_' + str(channel) + '_channel'
-        # Get the method from 'self'. Default to a lambda.
-        method = getattr(self, method_name)
-        # Call the method
-        downsampling_x = 2
-        downsampling_y = 4
-        im_out = method(im, downsampling_x, downsampling_y)
-
-        # first column is nan for red channel, discard it
-        return im_out[:, 1::]
-
-    def discard_bad_pixels_for_red_channel(self, im, downsampling_x, downsampling_y):
-        n_row = im.shape[0]
-        n_col = im.shape[1]
-
-        x_keep = np.arange(0, n_row, downsampling_x)
-        y_keep = np.arange(1, n_col, downsampling_y)
-        tmp = im[x_keep, :]
-        tmp = tmp[:, y_keep]
-        tmp[:, 0] = np.nan  # red channel first column is bad
-        im_out = np.nanmean(np.stack((tmp[::2, :], tmp[1::2, :]), axis=1), axis=1)
-
-        return im_out
-
-    def discard_bad_pixels_for_green_channel(self, im, downsampling_x, downsampling_y):
-        n_row = im.shape[0]
-        n_col = im.shape[1]
-
-        # greenr
-        x_keep = np.arange(0, n_row, downsampling_x)
-        y_keep = np.arange(0, n_col, downsampling_y)
-        tmp = im[x_keep, :]
-        tmp = tmp[:, y_keep]
-        tmp1 = np.mean(np.stack((tmp[::2, :], tmp[1::2, :]), axis=1), axis=1)
-        # greenb
-        x_keep = np.arange(1, n_row, downsampling_x)
-        y_keep = np.arange(1, n_col, downsampling_y)
-        tmp = im[x_keep, :]
-        tmp = tmp[:, y_keep]
-        tmp2 = np.mean(np.stack((tmp[::2, :], tmp[1::2, :]), axis=1), axis=1)
-
-        im_out = np.mean(np.stack((tmp1, tmp2), axis=1), axis=1)
-
-        return im_out
-
-    def discard_bad_pixels_for_blue_channel(self, im, downsampling_x, downsampling_y):
-        n_row = im.shape[0]
-        n_col = im.shape[1]
-
-        x_keep = np.arange(1, n_row, downsampling_x)
-        y_keep = np.arange(0, n_col, downsampling_y)
-        tmp = im[x_keep, :]
-        tmp = tmp[:, y_keep]
-        im_out = np.mean(np.stack((tmp[::2, :], tmp[1::2, :]), axis=1), axis=1)
-
-        return im_out
 
 
 def write_corrected_rgb_isxd_movie(rgb_basename_with_path,
@@ -456,15 +561,16 @@ class MovieHeader:
             im = np.array(mov)
         mov.close()
 
-        x = CorrectBadPixels()
+        x = DiscardBadPixels()
         # method0 = getattr(x, 'correct')
         # im = method0(im, channel)
-        im = x.correct(im, channel)
+        im = x.discard4channel(im, channel)
 
         self.n_row = im.shape[0]
         self.n_col = im.shape[1]
         self.shape = (self.n_row, self.n_col)
         self.correct_bad_pixels = True
+
 
     def add_exp_info(self):
         """
